@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     width: "75%",
     height: 50,
-    borderRadius: "10%",
+    borderRadius: 10,
     justifyContent: "center",
     paddingHorizontal: 10,
     marginBottom: 10,
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#00FFF5",
     width: "75%",
     height: 50,
-    borderRadius: "10%",
+    borderRadius: 10,
     justifyContent: "center",
   },
   signup: {
