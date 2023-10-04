@@ -1,5 +1,12 @@
-import { Text, View, SafeAreaView, StyleSheet, TextInput } from "react-native";
-import React, { Component, useState } from "react";
+import {
+  Text,
+  View,
+  SafeAreaView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+import React, { useState } from "react";
 
 export default function Home({ navigation }) {
   const [prompt, setPrompt] = useState("");
@@ -8,14 +15,24 @@ export default function Home({ navigation }) {
       <View style={styles.parent}>
         <View styele={styles.child}>
           <Text style={styles.spoton}>SpotOn</Text>
-          <View style={styles.formbg}>
-            <TextInput
-              style={styles.textinput}
-              placeholder="What do you feel like listening to today?"
-              placeholderTextColor="#00FFF5"
-              value={prompt}
-              onChangeText={(text) => setPrompt(text)}
-            />
+          <View style={styles.smallparent}>
+            <View style={styles.formbg}>
+              <TextInput
+                style={styles.textinput}
+                placeholder="What do you feel like listening to today?"
+                placeholderTextColor="#00FFF5"
+                value={prompt}
+                onChangeText={(text) => setPrompt(text)}
+              />
+            </View>
+            <TouchableOpacity
+              style={styles.gobutton}
+              onPress={() => {
+                navigation.navigate("Results");
+              }}
+            >
+              <Text>Go</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -50,12 +67,25 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     width: 300,
     height: 50,
-    borderRadius: 10,
+    borderBottomLeftRadius: 10,
+    borderTopLeftRadius: 10,
     justifyContent: "center",
     paddingHorizontal: 10,
     marginBottom: 10,
   },
   textinput: {
     width: "100%",
+  },
+  gobutton: {
+    backgroundColor: "#00FFF5",
+    height: 50,
+    width: 40,
+    borderBottomRightRadius: 10,
+    borderTopRightRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  smallparent: {
+    flexDirection: "row",
   },
 });
