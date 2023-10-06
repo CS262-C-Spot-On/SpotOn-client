@@ -5,12 +5,12 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-} from 'react-native';
-import * as Linking from 'expo-linking';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as WebBrowser from 'expo-web-browser';
-import { ResponseType, useAuthRequest } from 'expo-auth-session';
-import React, { useState } from 'react';
+} from "react-native";
+import * as Linking from "expo-linking";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as WebBrowser from "expo-web-browser";
+import { ResponseType, useAuthRequest } from "expo-auth-session";
+import React, { useState } from "react";
 import Slider from "react-native-slider";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -24,45 +24,44 @@ export default function Home({ navigation }) {
     setSliderValue(value);
   };
 
-  AsyncStorage.getItem('token').then(t => { setToken(t); });
+  AsyncStorage.getItem("token").then((t) => {
+    setToken(t);
+  });
 
   const discovery = {
-    authorizationEndpoint: 'https://accounts.spotify.com/authorize',
-    tokenEndpoint: 'https://accounts.spotify.com/api/token',
+    authorizationEndpoint: "https://accounts.spotify.com/authorize",
+    tokenEndpoint: "https://accounts.spotify.com/api/token",
   };
-  
+
   const [request, response, promptAsync] = useAuthRequest(
     {
       responseType: ResponseType.Token,
-      clientId: '8f0bb8f5fa3a43ceb0c4a669d403f1f1',
-      scopes: ['user-read-email', 'playlist-modify-public'],
+      clientId: "8f0bb8f5fa3a43ceb0c4a669d403f1f1",
+      scopes: ["user-read-email", "playlist-modify-public"],
       usePKCE: false,
       redirectUri: Linking.createURL(),
     },
     discovery
   );
-  
+
   React.useEffect(() => {
-    if (response?.type === 'success') {
+    if (response?.type === "success") {
       setToken(response.params.access_token);
-      AsyncStorage.setItem('token', response.params.access_token);
+      console.log(response.params.access_token);
+      AsyncStorage.setItem("token", response.params.access_token);
     }
   }, [response]);
 
   const logout = () => {
-    setToken("")
-    AsyncStorage.removeItem('token');
-  }
+    setToken("");
+    AsyncStorage.removeItem("token");
+  };
 
   return (
     <SafeAreaView style={styles.phone}>
       <View style={styles.parent}>
         <View styele={styles.child}>
           <Text style={styles.spoton}>SpotOn</Text>
-          { !token
-            ? <TouchableOpacity style={styles.logbutton} onPress={() => { promptAsync(); }}><Text>Login</Text></TouchableOpacity>
-            : <TouchableOpacity style={styles.logbutton} onPress={logout}><Text>Logout</Text></TouchableOpacity>
-          }
           <View style={styles.smallparent}>
             <View style={styles.formbg}>
               <TextInput
@@ -76,7 +75,7 @@ export default function Home({ navigation }) {
             <TouchableOpacity
               style={styles.gobutton}
               onPress={() => {
-                navigation.navigate("Results", {prompt: prompt});
+                navigation.navigate("Results", { prompt: prompt });
               }}
             >
               <Text>Go</Text>
@@ -95,6 +94,22 @@ export default function Home({ navigation }) {
               thumbTintColor="#00FFF5"
             />
             <Text style={styles.sltext}>Duration: {sliderValue}</Text>
+            <View style={styles.smallparent}>
+              {!token ? (
+                <TouchableOpacity
+                  style={styles.logbutton}
+                  onPress={() => {
+                    promptAsync();
+                  }}
+                >
+                  <Text>Login</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity style={styles.logbutton} onPress={logout}>
+                  <Text>Logout</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         </View>
       </View>
