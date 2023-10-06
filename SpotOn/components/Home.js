@@ -11,12 +11,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as WebBrowser from 'expo-web-browser';
 import { ResponseType, useAuthRequest } from 'expo-auth-session';
 import React, { useState } from 'react';
+import Slider from "react-native-slider";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function Home({ navigation }) {
   const [prompt, setPrompt] = useState("");
   const [token, setToken] = useState("");
+  const [sliderValue, setSliderValue] = useState(20);
+
+  const handleSliderChange = (value) => {
+    setSliderValue(value);
+  };
 
   AsyncStorage.getItem('token').then(t => { setToken(t); });
 
@@ -75,6 +81,20 @@ export default function Home({ navigation }) {
             >
               <Text>Go</Text>
             </TouchableOpacity>
+          </View>
+          <View>
+            <Slider
+              style={styles.slider}
+              value={sliderValue}
+              onValueChange={handleSliderChange}
+              minimumValue={1}
+              maximumValue={1000}
+              step={1}
+              minimumTrackTintColor="#00ADB5"
+              maximumTrackTintColor="gray"
+              thumbTintColor="#00FFF5"
+            />
+            <Text style={styles.sltext}>Duration: {sliderValue}</Text>
           </View>
         </View>
       </View>
@@ -137,5 +157,9 @@ const styles = StyleSheet.create({
   },
   smallparent: {
     flexDirection: "row",
+  },
+  sltext: {
+    color: "#00FFF5",
+    textAlign: "center",
   },
 });
