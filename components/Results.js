@@ -27,7 +27,6 @@ export default function Results({ route, navigation }) {
         })
         .then((data) => {
           setTracks(data.data.tracks.items);
-          console.log(data.data.tracks.items[0]);
         });
     });
   }, []);

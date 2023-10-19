@@ -47,7 +47,7 @@ export default function Home({ navigation }) {
   React.useEffect(() => {
     if (response?.type === "success") {
       setToken(response.params.access_token);
-      console.log(response.params.access_token);
+      // console.log(response.params.access_token);
       AsyncStorage.setItem("token", response.params.access_token);
     }
   }, [response]);
@@ -102,11 +102,11 @@ export default function Home({ navigation }) {
                     promptAsync();
                   }}
                 >
-                  <Text>Login</Text>
+                  <Text>Connect</Text>
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity style={styles.logbutton} onPress={logout}>
-                  <Text>Logout</Text>
+                  <Text>Disconnect</Text>
                 </TouchableOpacity>
               )}
             </View>
