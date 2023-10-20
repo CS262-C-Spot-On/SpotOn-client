@@ -24,10 +24,10 @@ export default function Results({ route, navigation }) {
 
     const payload = {
       data: [
-        'Write an ordered list of songs in the format ["SONG NAME" (AUTHOR)] according to the prompt "' + route.params.prompt + '". Do not write descriptions or give additional commentary.',
+        'Write an ordered list of songs in the format ["SONG NAME" (AUTHOR)] according to the prompt "' + route.params.prompt + '". Do not write descriptions or give additional commentary. Do not repeat songs.',
         null,
         '',
-        1024,
+        2048,
         0.1,
         0.05,
         1,
@@ -122,8 +122,8 @@ export default function Results({ route, navigation }) {
               )}
               <View style={styles.container2}>
                 <Text style={styles.text}>{track.name}</Text>
-                <Text style={styles.text}>{track.artists[0].name}</Text>
-                <Text style={styles.text}>{track.album.release_date.split('-')[0]}</Text>
+                <Text style={styles.text2}>{track.artists[0].name}</Text>
+                <Text style={styles.text2}>{track.album.release_date.split('-')[0]}</Text>
               </View>
             </View>
           ))
@@ -150,6 +150,9 @@ const styles = StyleSheet.create({
   },
   text: {
     color: globals.colors.text.primary,
+  },
+  text2: {
+    color: globals.colors.text.secondary,
   },
   image: {
     height: 50,
