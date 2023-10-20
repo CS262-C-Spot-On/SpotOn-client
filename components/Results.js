@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   ScrollView,
   Image,
@@ -185,3 +186,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   }
 });
+=======
+import { View, Text, SafeAreaView } from "react-native";
+import React from "react";
+
+export default function Results({ navigation }) {
+  return (
+    <SafeAreaView>
+      <Text>Results</Text>
+    </SafeAreaView>
+  );
+}
+>>>>>>> 359684e65892a58094e62304bb4ceb837110a57e

@@ -1,10 +1,15 @@
 import {
   Text,
   View,
+<<<<<<< HEAD
+=======
+  SafeAreaView,
+>>>>>>> 359684e65892a58094e62304bb4ceb837110a57e
   StyleSheet,
   TextInput,
   TouchableOpacity,
 } from "react-native";
+<<<<<<< HEAD
 import * as Linking from "expo-linking";
 import SafeAreaView from 'react-native-safe-area-view';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -51,6 +56,12 @@ export default function Home({ navigation }) {
     AsyncStorage.removeItem("token");
   };
 
+=======
+import React, { useState } from "react";
+
+export default function Home({ navigation }) {
+  const [prompt, setPrompt] = useState("");
+>>>>>>> 359684e65892a58094e62304bb4ceb837110a57e
   return (
     <SafeAreaView style={styles.phone}>
       <View style={styles.parent}>
@@ -61,7 +72,11 @@ export default function Home({ navigation }) {
               <TextInput
                 style={styles.textinput}
                 placeholder="What do you feel like listening to today?"
+<<<<<<< HEAD
                 placeholderTextColor={globals.colors.text.secondary}
+=======
+                placeholderTextColor="#00FFF5"
+>>>>>>> 359684e65892a58094e62304bb4ceb837110a57e
                 value={prompt}
                 onChangeText={(text) => setPrompt(text)}
               />
@@ -69,6 +84,7 @@ export default function Home({ navigation }) {
             <TouchableOpacity
               style={styles.gobutton}
               onPress={() => {
+<<<<<<< HEAD
                 navigation.navigate("Results", { prompt: prompt });
               }}
             >
@@ -93,6 +109,14 @@ export default function Home({ navigation }) {
               )}
             </View>
           </View>
+=======
+                navigation.navigate("Results");
+              }}
+            >
+              <Text>Go</Text>
+            </TouchableOpacity>
+          </View>
+>>>>>>> 359684e65892a58094e62304bb4ceb837110a57e
         </View>
       </View>
     </SafeAreaView>
@@ -103,7 +127,11 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     flex: 1,
+<<<<<<< HEAD
     backgroundColor: globals.colors.base.primary,
+=======
+    backgroundColor: "#222831",
+>>>>>>> 359684e65892a58094e62304bb4ceb837110a57e
   },
   parent: {
     flex: 1,
@@ -116,12 +144,20 @@ const styles = StyleSheet.create({
   spoton: {
     fontWeight: "bold",
     fontSize: 40,
+<<<<<<< HEAD
     color: globals.colors.text.primary,
+=======
+    color: "#00FFF5",
+>>>>>>> 359684e65892a58094e62304bb4ceb837110a57e
     textAlign: "center",
     marginBottom: "5%",
   },
   formbg: {
+<<<<<<< HEAD
     backgroundColor: globals.colors.base.secondary,
+=======
+    backgroundColor: "#393E46",
+>>>>>>> 359684e65892a58094e62304bb4ceb837110a57e
     borderColor: "grey",
     borderStyle: "solid",
     width: 300,
@@ -134,10 +170,16 @@ const styles = StyleSheet.create({
   },
   textinput: {
     width: "100%",
+<<<<<<< HEAD
     color: globals.colors.text.primary,
   },
   gobutton: {
     backgroundColor: globals.colors.base.accent,
+=======
+  },
+  gobutton: {
+    backgroundColor: "#00FFF5",
+>>>>>>> 359684e65892a58094e62304bb4ceb837110a57e
     height: 50,
     width: 40,
     borderBottomRightRadius: 10,
@@ -145,6 +187,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+<<<<<<< HEAD
   spotifybutton: {
     backgroundColor: globals.colors.base.accent,
     height: 30,
@@ -160,5 +203,9 @@ const styles = StyleSheet.create({
   sltext: {
     color: globals.colors.text.primary,
     textAlign: "center",
+=======
+  smallparent: {
+    flexDirection: "row",
+>>>>>>> 359684e65892a58094e62304bb4ceb837110a57e
   },
 });
