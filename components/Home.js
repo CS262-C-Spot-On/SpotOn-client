@@ -1,28 +1,23 @@
 import {
   Text,
   View,
-  SafeAreaView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
 } from "react-native";
 import * as Linking from "expo-linking";
+import SafeAreaView from 'react-native-safe-area-view';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as WebBrowser from "expo-web-browser";
 import { ResponseType, useAuthRequest } from "expo-auth-session";
 import React, { useState } from "react";
-import Slider from "react-native-slider";
+import globals from "../Globals";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function Home({ navigation }) {
   const [prompt, setPrompt] = useState("");
   const [token, setToken] = useState("");
-  const [sliderValue, setSliderValue] = useState(20);
-
-  const handleSliderChange = (value) => {
-    setSliderValue(value);
-  };
 
   AsyncStorage.getItem("token").then((t) => {
     setToken(t);
@@ -47,7 +42,6 @@ export default function Home({ navigation }) {
   React.useEffect(() => {
     if (response?.type === "success") {
       setToken(response.params.access_token);
-      // console.log(response.params.access_token);
       AsyncStorage.setItem("token", response.params.access_token);
     }
   }, [response]);
@@ -67,7 +61,7 @@ export default function Home({ navigation }) {
               <TextInput
                 style={styles.textinput}
                 placeholder="What do you feel like listening to today?"
-                placeholderTextColor="#00FFF5"
+                placeholderTextColor={globals.colors.text.secondary}
                 value={prompt}
                 onChangeText={(text) => setPrompt(text)}
               />
@@ -78,35 +72,23 @@ export default function Home({ navigation }) {
                 navigation.navigate("Results", { prompt: prompt });
               }}
             >
-              <Text>Go</Text>
+              <Text style={{fontWeight: "bold"}}>Go</Text>
             </TouchableOpacity>
           </View>
-          <View>
-            <Slider
-              style={styles.slider}
-              value={sliderValue}
-              onValueChange={handleSliderChange}
-              minimumValue={1}
-              maximumValue={1000}
-              step={1}
-              minimumTrackTintColor="#00ADB5"
-              maximumTrackTintColor="gray"
-              thumbTintColor="#00FFF5"
-            />
-            <Text style={styles.sltext}>Duration: {sliderValue}</Text>
-            <View style={styles.smallparent}>
+          <View style={styles.smallparent}>
+            <View>
               {!token ? (
                 <TouchableOpacity
-                  style={styles.logbutton}
+                  style={styles.spotifybutton}
                   onPress={() => {
                     promptAsync();
                   }}
                 >
-                  <Text>Connect</Text>
+                  <Text style={{fontWeight: "bold"}}>Connect</Text>
                 </TouchableOpacity>
               ) : (
-                <TouchableOpacity style={styles.logbutton} onPress={logout}>
-                  <Text>Disconnect</Text>
+                <TouchableOpacity style={styles.spotifybutton} onPress={logout}>
+                  <Text style={{fontWeight: "bold"}}>Disconnect</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -121,7 +103,7 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     flex: 1,
-    backgroundColor: "#222831",
+    backgroundColor: globals.colors.base.primary,
   },
   parent: {
     flex: 1,
@@ -134,12 +116,12 @@ const styles = StyleSheet.create({
   spoton: {
     fontWeight: "bold",
     fontSize: 40,
-    color: "#00FFF5",
+    color: globals.colors.text.primary,
     textAlign: "center",
     marginBottom: "5%",
   },
   formbg: {
-    backgroundColor: "#393E46",
+    backgroundColor: globals.colors.base.secondary,
     borderColor: "grey",
     borderStyle: "solid",
     width: 300,
@@ -152,9 +134,10 @@ const styles = StyleSheet.create({
   },
   textinput: {
     width: "100%",
+    color: globals.colors.text.primary,
   },
   gobutton: {
-    backgroundColor: "#00FFF5",
+    backgroundColor: globals.colors.base.accent,
     height: 50,
     width: 40,
     borderBottomRightRadius: 10,
@@ -162,19 +145,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  logbutton: {
-    backgroundColor: "#00FFF5",
+  spotifybutton: {
+    backgroundColor: globals.colors.base.accent,
     height: 30,
-    width: 50,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
+    padding: 7,
   },
   smallparent: {
     flexDirection: "row",
+    justifyContent: "center",
   },
   sltext: {
-    color: "#00FFF5",
+    color: globals.colors.text.primary,
     textAlign: "center",
   },
 });
