@@ -1,9 +1,10 @@
 import React, { Component, useState } from "react";
+import globals from "../Globals";
+import SafeAreaView from 'react-native-safe-area-view';
 import {
   Text,
   View,
   StyleSheet,
-  SafeAreaView,
   TextInput,
   Pressable,
   Touchable,
@@ -38,8 +39,7 @@ export default function SignUp({ navigation }) {
               <TextInput
                 style={styles.textinput}
                 placeholder="Name"
-                placeholderTextColor="#00FFF5"
-                textColor="#00FFF5"
+                placeholderTextColor={globals.colors.text.secondary}
                 value={name}
                 onChangeText={(text) => setName(text)}
               />
@@ -48,7 +48,7 @@ export default function SignUp({ navigation }) {
               <TextInput
                 style={styles.textinput}
                 placeholder="Email"
-                placeholderTextColor="#00FFF5"
+                placeholderTextColor={globals.colors.text.secondary}
                 value={email}
                 onChangeText={(text) => setEmail(text)}
               />
@@ -57,7 +57,7 @@ export default function SignUp({ navigation }) {
               <TextInput
                 style={styles.textinput}
                 placeholder="Password"
-                placeholderTextColor="#00FFF5"
+                placeholderTextColor={globals.colors.text.secondary}
                 secureTextEntry={true}
                 value={password}
                 onChangeText={(text) => setPassword(text)}
@@ -106,50 +106,48 @@ export default function SignUp({ navigation }) {
 const styles = StyleSheet.create({
   phone: {
     flex: 1,
-    backgroundColor: "#222831",
+    backgroundColor: globals.colors.base.primary,
   },
   container: {
     flex: 1,
-    //backgroundColor: "dodgerblue",
-    //justifyContent: "center",
     alignItems: "center",
   },
   centerbox: {
-    //backgroundColor: "white",
     width: "100%",
     height: "100%",
   },
   appname: {
     width: "100%",
     height: "15%",
-    //backgroundColor: "orange",
     justifyContent: "center",
     alignItems: "center",
   },
   instagram: {
     fontWeight: "bold",
     fontSize: 40,
-    color: "#00FFF5",
+    color: globals.colors.base.accent,
+  },
+  textinput: {
+    color: globals.colors.text.primary
   },
   sumessage: {
-    //backgroundColor: "pink",
     height: "5%",
     alignItems: "center",
   },
   message: {
     textAlign: "center",
     fontWeight: "bold",
-    color: "#00ADB5",
+    color: globals.colors.text.primary,
   },
   formfield: {
-    backgroundColor: "#222831",
+    backgroundColor: globals.colors.base.primary,
     width: "100%",
     height: "40%",
     justifyContent: "center",
     alignItems: "center",
   },
   formbg: {
-    backgroundColor: "#393E46",
+    backgroundColor: globals.colors.base.secondary,
     borderColor: "grey",
     borderStyle: "solid",
     width: "75%",
@@ -160,14 +158,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sufield: {
-    //backgroundColor: "pink",
     width: "100%",
     height: "10%",
     justifyContent: "center",
     alignItems: "center",
   },
   subutton: {
-    backgroundColor: "#00FFF5",
+    backgroundColor: globals.colors.base.accent,
     width: "75%",
     height: 50,
     borderRadius: 10,
@@ -175,17 +172,16 @@ const styles = StyleSheet.create({
   },
   signup: {
     textAlign: "center",
-    color: "#222831",
+    color: globals.colors.base.primary,
     fontWeight: "bold",
   },
   tcmessage: {
-    //backgroundColor: "orange",
     height: "10%",
     alignItems: "center",
   },
 
   tc: {
-    color: "#00ADB5",
+    color: globals.colors.text.secondary,
     textAlign: "center",
   },
   logindiv: {
@@ -197,7 +193,7 @@ const styles = StyleSheet.create({
   },
   flexbox: {
     flex: 1,
-    backgroundColor: "#222831",
+    backgroundColor: globals.colors.base.primary,
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
@@ -206,9 +202,9 @@ const styles = StyleSheet.create({
   },
 
   lgtext2: {
-    color: "#00FFF5",
+    color: globals.colors.text.primary,
   },
   lgtext1: {
-    color: "#00ADB5",
+    color: globals.colors.text.primary,
   },
 });

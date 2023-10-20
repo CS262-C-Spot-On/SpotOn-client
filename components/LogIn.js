@@ -36,7 +36,7 @@ export default function LogIn({ navigation }) {
               <TextInput
                 style={styles.textinput}
                 placeholder="Email"
-                placeholderTextColor="#00FFF5"
+                placeholderTextColor={globals.colors.text.secondary}
                 value={email}
                 onChangeText={(text) => setEmail(text)}
               />
@@ -45,21 +45,21 @@ export default function LogIn({ navigation }) {
               <TextInput
                 style={styles.textinput}
                 placeholder="Password"
-                placeholderTextColor="#00FFF5"
+                placeholderTextColor={globals.colors.text.secondary}
                 secureTextEntry={true}
                 value={password}
                 onChangeText={(text) => setPassword(text)}
               />
             </View>
           </View>
-          <View style={styles.sufield}>
+          <View style={styles.loginfield}>
             <TouchableOpacity
-              style={styles.subutton}
+              style={styles.loginbutton}
               onPress={() => {
                 navigation.navigate("Home");
               }}
             >
-              <Text style={styles.signup}>Log In</Text>
+              <Text style={styles.logintext}>Log In</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -72,52 +72,44 @@ const styles = StyleSheet.create({
   phone: {
     height: "100%",
     flex: 1,
-    backgroundColor: "#222831",
+    backgroundColor: globals.colors.base.primary,
   },
   container: {
     flex: 1,
-    //backgroundColor: "dodgerblue",
-    //justifyContent: "center",
     alignItems: "center",
   },
   centerbox: {
-    //backgroundColor: "white",
     width: "100%",
     height: "100%",
   },
   appname: {
     width: "100%",
     height: "15%",
-    //backgroundColor: "orange",
     justifyContent: "center",
     alignItems: "center",
   },
   instagram: {
     fontWeight: "bold",
     fontSize: 40,
-    color: "#00FFF5",
+    color: globals.colors.text.primary,
   },
   sumessage: {
-    //backgroundColor: "pink",
     height: "5%",
     alignItems: "center",
   },
   message: {
     textAlign: "center",
     fontWeight: "bold",
-    color: "#00ADB5",
+    color: globals.colors.text.secondary,
   },
   formfield: {
-    backgroundColor: "#222831",
     width: "100%",
     height: "40%",
     justifyContent: "center",
     alignItems: "center",
   },
   formbg: {
-    backgroundColor: "#393E46",
-    borderColor: "grey",
-    borderStyle: "solid",
+    backgroundColor: globals.colors.base.secondary,
     width: "75%",
     height: 50,
     borderRadius: 10,
@@ -125,57 +117,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 10,
   },
-  sufield: {
-    //backgroundColor: "pink",
+  loginfield: {
     width: "100%",
     height: "10%",
     justifyContent: "center",
     alignItems: "center",
   },
-  subutton: {
+  loginbutton: {
     marginTop: "25%",
-    backgroundColor: "#00FFF5",
+    backgroundColor: globals.colors.base.accent,
     width: "75%",
     height: 50,
     borderRadius: 10,
     justifyContent: "center",
   },
-  signup: {
+  logintext: {
     textAlign: "center",
-    color: "#222831",
+    color: globals.colors.text.accent,
     fontWeight: "bold",
   },
-  tcmessage: {
-    //backgroundColor: "orange",
-    height: "10%",
-    alignItems: "center",
-  },
-
-  tc: {
-    color: "#00ADB5",
-    textAlign: "center",
-  },
-  logindiv: {
-    backgroundColor: "white",
-    height: "10%",
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-  },
-  flexbox: {
-    flex: 1,
-    backgroundColor: "#222831",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 25,
-  },
-
-  lgtext2: {
-    color: "#00FFF5",
-  },
-  lgtext1: {
-    color: "#00ADB5",
+  textinput: {
+    color: globals.colors.text.primary
   },
 });
