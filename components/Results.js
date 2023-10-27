@@ -4,13 +4,14 @@ import {
   View,
   Text,
   StyleSheet,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
-import SafeAreaView from 'react-native-safe-area-view';
+import LottieView from "lottie-react-native";
+import SafeAreaView from "react-native-safe-area-view";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import uuid from 'react-uuid';
+import uuid from "react-uuid";
 import globals from "../Globals";
 
 export default function Results({ route, navigation }) {
@@ -21,7 +22,7 @@ export default function Results({ route, navigation }) {
 
     // Inital Llama2-chat connection
     const gradio = axios.create({
-      baseURL: 'https://huggingface-projects-llama-2-7b-chat.hf.space',
+      baseURL: "https://huggingface-projects-llama-2-7b-chat.hf.space",
     });
 
     // Data sent to LLM server
@@ -35,7 +36,7 @@ export default function Results({ route, navigation }) {
         0.1,
         0.05,
         1,
-        1
+        1,
       ],
       fn_index: 11, // chat function index
       session_hash: uuid()
@@ -71,10 +72,12 @@ export default function Results({ route, navigation }) {
           }).filter(song => song.name && song.name !== 'SONG NAME');
         }
       } else {
-        var songs = matches.map(match => {
-          const [, name, author] = /\"(.*?)\".*?\((.*?)\)/g.exec(match) || '';
-          return { name, author };
-        }).filter(song => song.name && song.name !== 'SONG NAME');
+        var songs = matches
+          .map((match) => {
+            const [, name, author] = /\"(.*?)\".*?\((.*?)\)/g.exec(match) || "";
+            return { name, author };
+          })
+          .filter((song) => song.name && song.name !== "SONG NAME");
       }
 
       // Lookup each song on spotify
@@ -93,34 +96,36 @@ export default function Results({ route, navigation }) {
             })
             .then((data) => {
               let found = false;
-              data.data.tracks.items.forEach(slice => {
-                if (!found && slice.artists[0].name.toLowerCase().replaceAll(/\s|(the)/g,'') === song.author.toLowerCase().replaceAll(/\s|(the)/g,''))
-                {
-                  setTracks(old => [...old, slice]);
+              data.data.tracks.items.forEach((slice) => {
+                if (
+                  !found &&
+                  slice.artists[0].name
+                    .toLowerCase()
+                    .replaceAll(/\s|(the)/g, "") ===
+                    song.author.toLowerCase().replaceAll(/\s|(the)/g, "")
+                ) {
+                  setTracks((old) => [...old, slice]);
                   found = true;
                 }
-              })
-              if (!found){
-                setTracks(old => [...old, data.data.tracks.items[0]]);
+              });
+              if (!found) {
+                setTracks((old) => [...old, data.data.tracks.items[0]]);
               }
             });
         });
       });
     });
-    
   }, []);
 
   return (
     <SafeAreaView style={styles.phone}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        {
-          tracks.length > 0 ?
+        {tracks.length > 0 ? (
           <View style={styles.header}>
             <Text style={styles.text}>Say hello to your new playlist!</Text>
-          </View> : null
-        }
-        {
-          tracks.length > 0 ?
+          </View>
+        ) : null}
+        {tracks.length > 0 ? (
           tracks.map((track) => (
             <View key={track.id} style={styles.trackContainer}>
               {track.album.images.length ? (
@@ -138,19 +143,31 @@ export default function Results({ route, navigation }) {
               <View style={styles.container2}>
                 <Text style={styles.text}>{track.name}</Text>
                 <Text style={styles.text2}>{track.artists[0].name}</Text>
-                <Text style={styles.text2}>{track.album.release_date.split('-')[0]}</Text>
+                <Text style={styles.text2}>
+                  {track.album.release_date.split("-")[0]}
+                </Text>
               </View>
             </View>
           ))
-          :
-          <View style={styles.center}>
-            <View style={styles.group}>
-              <ActivityIndicator/>
-              <Text style={styles.text}>Wait here just a sec!</Text>
-              <Text style={styles.text}>We're making your really awesome playlist now!</Text>
-            </View>
+        ) : (
+          <View style={styles.border}>
+            <LottieView
+              // style={styles.lottie}
+              style={{
+                width: 300,
+                height: 300,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              source={require("../assets/lottie.json")}
+              autoPlay
+              loop
+            />
+            <Text style={styles.loadertext}>
+              We are preparing your playlist
+            </Text>
           </View>
-        }
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -158,14 +175,20 @@ export default function Results({ route, navigation }) {
 
 const styles = StyleSheet.create({
   phone: {
-    height: "100%",
-    width: "100%",
+    // height: "100%",
+    // width: "100%",
     flex: 1,
     backgroundColor: globals.colors.base.primary,
     paddingHorizontal: 5,
+    justifyContent: "center",
+    alignItems: "center",
   },
   text: {
     color: globals.colors.text.primary,
+  },
+  loadertext: {
+    color: globals.colors.text.primary,
+    alignSelf: "center",
   },
   text2: {
     color: globals.colors.text.secondary,
@@ -181,7 +204,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     marginBottom: 25,
-    marginTop: 50
+    marginTop: 50,
   },
   trackContainer: {
     flexDirection: "row", // Arrange image and text in a row
@@ -194,13 +217,22 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   center: {
-    height: "100%",
-    flexDirection: "row",
+    // height: "100%",
+    // width: "100%",
+    // flexDirection: "row",
+    backgroundColor: "pink",
+    flex: 1,
     alignItems: "center",
+    justifyContent: "center",
   },
   group: {
     width: "100%",
-    flexDirection: "column",
+    // flexDirection: "column",
     alignItems: "center",
-  }
+    justify: "center",
+  },
+
+  border: {
+    marginTop: "50%",
+  },
 });
