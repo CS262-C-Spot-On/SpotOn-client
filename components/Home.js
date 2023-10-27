@@ -1,6 +1,7 @@
 import {
   Text,
   View,
+  Image,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -12,15 +13,26 @@ import * as WebBrowser from "expo-web-browser";
 import { ResponseType, useAuthRequest } from "expo-auth-session";
 import React, { useState } from "react";
 import globals from "../Globals";
+import axios from "axios";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function Home({ navigation }) {
   const [prompt, setPrompt] = useState("");
   const [token, setToken] = useState("");
+  const [photo, setPhoto] = useState("");
+  const [url, setURL] = useState("");
 
   AsyncStorage.getItem("token").then((t) => {
     setToken(t);
+  });
+
+  AsyncStorage.getItem("SpotifyPhoto").then((p) => {
+    setPhoto(p);
+  });
+
+  AsyncStorage.getItem("SpotifyUrl").then((u) => {
+    setURL(u);
   });
 
   const discovery = {
@@ -32,7 +44,7 @@ export default function Home({ navigation }) {
     {
       responseType: ResponseType.Token,
       clientId: "8f0bb8f5fa3a43ceb0c4a669d403f1f1",
-      scopes: ["user-read-email", "playlist-modify-public"],
+      scopes: ["user-read-email", "playlist-modify-public", "playlist-modify-private"],
       usePKCE: false,
       redirectUri: Linking.createURL(),
     },
@@ -43,12 +55,31 @@ export default function Home({ navigation }) {
     if (response?.type === "success") {
       setToken(response.params.access_token);
       AsyncStorage.setItem("token", response.params.access_token);
+      axios.get("https://api.spotify.com/v1/me", {
+        headers: {
+          Authorization: `Bearer ${response.params.access_token}`,
+        },
+        params: {},
+      }).then((data) => {
+        AsyncStorage.setItem("SpotifyName", data.data.display_name);
+        AsyncStorage.setItem("SpotifyUrl", data.data.external_urls.spotify);
+        AsyncStorage.setItem("SpotifyID", data.data.id);
+        AsyncStorage.setItem("SpotifyPhoto", data.data.images[0].url);
+        setPhoto(data.data.images[0].url);
+        setURL(data.data.external_urls.spotify);
+      });
     }
   }, [response]);
 
   const logout = () => {
     setToken("");
+    setPhoto("");
+    setURL("");
     AsyncStorage.removeItem("token");
+    AsyncStorage.removeItem("SpotifyName");
+    AsyncStorage.removeItem("SpotifyUrl");
+    AsyncStorage.removeItem("SpotifyID");
+    AsyncStorage.removeItem("SpotifyPhoto");
   };
 
   return (
@@ -92,6 +123,11 @@ export default function Home({ navigation }) {
                 </TouchableOpacity>
               )}
             </View>
+            { !photo ? <></> : 
+              <TouchableOpacity onPress={() => {Linking.openURL(url);}}>
+                <Image style={styles.image} source={{uri: photo}}/>
+              </TouchableOpacity>
+            }
           </View>
         </View>
       </View>
@@ -161,5 +197,11 @@ const styles = StyleSheet.create({
   sltext: {
     color: globals.colors.text.primary,
     textAlign: "center",
+  },
+  image: {
+    height: 30,
+    width: 30,
+    marginLeft: 10,
+    borderRadius: 25,
   },
 });

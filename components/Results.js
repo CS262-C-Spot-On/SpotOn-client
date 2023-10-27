@@ -5,11 +5,13 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
+  TouchableOpacity
 } from "react-native";
 import LottieView from "lottie-react-native";
 import SafeAreaView from "react-native-safe-area-view";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
+import * as Linking from "expo-linking";
 import axios from "axios";
 import uuid from "react-uuid";
 import globals from "../Globals";
@@ -44,7 +46,7 @@ export default function Results({ route, navigation }) {
     
     // Continually probe for finished response
     function predict(callback, lastoutput='') {
-      gradio.post('/--replicas/68mtz/api/predict/', payload).then(result => {
+      gradio.post('/--replicas/gm5p8/api/predict/', payload).then(result => {
         if (result.data.is_generating){
           console.log(result.data.data[0]);
           predict(callback, result.data.data[0]);
@@ -117,12 +119,50 @@ export default function Results({ route, navigation }) {
     });
   }, []);
 
+  function makePlaylist() {
+    AsyncStorage.getItem("token").then((token) => {
+      AsyncStorage.getItem("SpotifyID").then((id) => {
+        axios.post("https://api.spotify.com/v1/users/"+id+"/playlists", 
+          {
+            name: "SpotOn Generated Playlist",
+            description: 'This playlist was generated with SpotOn using the prompt "' + route.params.prompt + '". Feel free to change the name and description to your liking!',
+            public: false,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            }
+          }
+        )
+        .then((data) => {
+          axios.post("https://api.spotify.com/v1/playlists/"+data.data.id+"/tracks", 
+            {
+              uris: tracks.map((track) => track.uri),
+              position: 0,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              }
+            }
+          )
+          .then((trackdata) => {
+            Linking.openURL(data.data.external_urls.spotify);
+          });
+        });
+      });
+    });
+  }
+
   return (
     <SafeAreaView style={styles.phone}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         {tracks.length > 0 ? (
           <View style={styles.header}>
             <Text style={styles.text}>Say hello to your new playlist!</Text>
+            <TouchableOpacity style={styles.spotifybutton} onPress={makePlaylist}>
+              <Text style={{fontWeight: "bold"}}>Send to Spotify</Text>
+            </TouchableOpacity>
           </View>
         ) : null}
         {tracks.length > 0 ? (
@@ -175,13 +215,11 @@ export default function Results({ route, navigation }) {
 
 const styles = StyleSheet.create({
   phone: {
-    // height: "100%",
-    // width: "100%",
+    height: "100%",
+    width: "100%",
     flex: 1,
     backgroundColor: globals.colors.base.primary,
     paddingHorizontal: 5,
-    justifyContent: "center",
-    alignItems: "center",
   },
   text: {
     color: globals.colors.text.primary,
@@ -203,8 +241,8 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "column",
     alignItems: "center",
-    marginBottom: 25,
-    marginTop: 50,
+    marginBottom: 20,
+    marginTop: 40,
   },
   trackContainer: {
     flexDirection: "row", // Arrange image and text in a row
@@ -217,22 +255,29 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   center: {
-    // height: "100%",
-    // width: "100%",
-    // flexDirection: "row",
-    backgroundColor: "pink",
-    flex: 1,
+    height: "100%",
+    width: "100%",
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
   },
   group: {
     width: "100%",
-    // flexDirection: "column",
+    flexDirection: "column",
     alignItems: "center",
-    justify: "center",
   },
-
   border: {
     marginTop: "50%",
+    width: "100%",
+    alignItems: "center",
+  },
+  spotifybutton: {
+    backgroundColor: globals.colors.base.accent,
+    height: 30,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingLeft: 7,
+    paddingRight: 7,
+    marginTop: 20
   },
 });
