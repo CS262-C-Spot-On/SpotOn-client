@@ -4,6 +4,7 @@ import {
   View,
   Text,
   StyleSheet,
+  ActivityIndicator
 } from "react-native";
 import SafeAreaView from 'react-native-safe-area-view';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -18,25 +19,29 @@ export default function Results({ route, navigation }) {
   useEffect(() => {
     setTracks([]);
 
+    // Inital Llama2-chat connection
     const gradio = axios.create({
       baseURL: 'https://huggingface-projects-llama-2-7b-chat.hf.space',
     });
 
+    // Data sent to LLM server
     const payload = {
       data: [
-        'Write an ordered list of songs in the format ["SONG NAME" (AUTHOR)] according to the prompt "' + route.params.prompt + '". Do not write descriptions or give additional commentary. Do not repeat songs.',
+        'Write an ordered list of songs in the format ["SONG NAME" (AUTHOR)] according to the prompt "' // Main prompt
+        + route.params.prompt + '". Do not write descriptions or give additional commentary. Do not repeat songs.',
         null,
-        '',
-        2048,
+        '', // System prompt
+        2048, // Max tokens for response
         0.1,
         0.05,
         1,
         1
       ],
-      fn_index: 11, // chat
+      fn_index: 11, // chat function index
       session_hash: uuid()
     }
-  
+    
+    // Continually probe for finished response
     function predict(callback, lastoutput='') {
       gradio.post('/--replicas/68mtz/api/predict/', payload).then(result => {
         if (result.data.is_generating){
@@ -48,14 +53,23 @@ export default function Results({ route, navigation }) {
       });
     }
 
+    // Sent data to server and parse results
     predict(result => {
       const matches = result.match(/\".*?\".*?\(.*?\)/g);
       if (!matches) {
         const matches = result.match(/\".*?\" by .*?\n/g);
-        var songs = matches.map(match => {
-          const [, name, author] = /\"(.*?)\" by (.*?)\n/g.exec(match) || '';
-          return { name, author };
-        }).filter(song => song.name && song.name !== 'SONG NAME');
+        if (!matches) {
+          const matches = result.match(/.*?\s*\(.*?\)\n/g);
+          var songs = matches.map(match => {
+            const [, name, author] = /(.*?)\s*\((.*?)\)\n/g.exec(match) || '';
+            return { name, author };
+          }).filter(song => song.name && song.name !== 'SONG NAME');
+        } else {
+          var songs = matches.map(match => {
+            const [, name, author] = /\"(.*?)\" by (.*?)\n/g.exec(match) || '';
+            return { name, author };
+          }).filter(song => song.name && song.name !== 'SONG NAME');
+        }
       } else {
         var songs = matches.map(match => {
           const [, name, author] = /\"(.*?)\".*?\((.*?)\)/g.exec(match) || '';
@@ -63,6 +77,7 @@ export default function Results({ route, navigation }) {
         }).filter(song => song.name && song.name !== 'SONG NAME');
       }
 
+      // Lookup each song on spotify
       songs.forEach(song => {
         console.log(song.name);
         AsyncStorage.getItem("token").then((token) => {
@@ -130,6 +145,7 @@ export default function Results({ route, navigation }) {
           :
           <View style={styles.center}>
             <View style={styles.group}>
+              <ActivityIndicator/>
               <Text style={styles.text}>Wait here just a sec!</Text>
               <Text style={styles.text}>We're making your really awesome playlist now!</Text>
             </View>

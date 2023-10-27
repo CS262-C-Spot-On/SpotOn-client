@@ -1,4 +1,7 @@
+
+// Global variables for use throughout project
 export default globals = {
+    // Default theme
     colors: {
         base: {
             primary: '#222831',

@@ -151,7 +151,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    padding: 7,
+    paddingLeft: 7,
+    paddingRight: 7,
   },
   smallparent: {
     flexDirection: "row",
