@@ -56,33 +56,6 @@ export default function Results({ route, navigation }) {
       });
     }
 
-    // add a song to the list if it doesn't exist
-    let songlist = [];
-    function addSong(song) {
-      let found = false;
-      console.log(songlist.length);
-      tracks.forEach((s) => {
-        console.log(s.id);
-        console.log(song.id);
-        if (s.id == song.id) {
-          found = true;
-          console.log('boo');
-          return;
-        }
-      });
-      console.log(found);
-      if (!found) {
-        songlist.push(song);
-        console.log("---------------");
-        console.log(songlist);
-        console.log('===============')
-        if (tracks.length < songlist.length) {
-          console.log('YEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEET')
-          setTracks(songlist);
-        }
-      }
-    }
-
     // Sent data to server and parse results
     predict(result => {
       const matches = result.match(/\".*?\".*?\(.*?\)/g);
@@ -133,12 +106,12 @@ export default function Results({ route, navigation }) {
                     .replaceAll(/\s|(the)/g, "") ===
                     song.author.toLowerCase().replaceAll(/\s|(the)/g, "")
                 ) {
-                  addSong(slice);
+                  setTracks((old) => [...old, slice]);
                   found = true;
                 }
               });
               if (!found) {
-                addSong(data.data.tracks.items[0]);
+                setTracks((old) => [...old, data.data.tracks.items[0]]);
               }
             });
         });
