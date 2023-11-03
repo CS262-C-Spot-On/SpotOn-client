@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Modal,
 } from "react-native";
 import * as Linking from "expo-linking";
 import SafeAreaView from "react-native-safe-area-view";
@@ -22,9 +23,11 @@ export default function Home({ navigation }) {
   const [token, setToken] = useState("");
   const [photo, setPhoto] = useState("");
   const [url, setURL] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
 
   AsyncStorage.getItem("token").then((t) => {
     setToken(t);
+    setModalVisible(!t);
   });
 
   AsyncStorage.getItem("SpotifyPhoto").then((p) => {
@@ -143,9 +146,30 @@ export default function Home({ navigation }) {
           </View>
         </View>
       </View>
-      {/* <View style={styles.navbar}>
-        <Text>navbar</Text>
-      </View> */}
+      {/* Modal for Spotify Connection */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Connect to Spotify to continue</Text>
+            <TouchableOpacity
+              style={styles.spotifybutton}
+              onPress={() => {
+                promptAsync();
+              }}
+            >
+              <Text style={{ fontWeight: "bold" }}>Connect to Spotify</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -221,5 +245,38 @@ const styles = StyleSheet.create({
   },
   navbar: {
     backgroundColor: globals.colors.base.secondary,
+  },
+
+  // Modal stuff
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  spotifybutton: {
+    backgroundColor: globals.colors.base.accent,
+    borderRadius: 10,
+    padding: 10,
+    elevation: 2,
   },
 });
