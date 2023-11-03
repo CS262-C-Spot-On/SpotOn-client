@@ -18,6 +18,10 @@ import globals from "../Globals";
 
 export default function Results({ route, navigation }) {
   const [tracks, setTracks] = useState([]);
+  const [info, setInfo] = useState({
+    name: 'SpotOn Generated Playlist', 
+    description: 'This playlist was generated with SpotOn using the prompt "' + route.params.prompt + '". Feel free to change the name and description to your liking!'
+  });
 
   useEffect(() => {
     setTracks([]);
@@ -26,38 +30,40 @@ export default function Results({ route, navigation }) {
     const gradio = axios.create({
       baseURL: "https://huggingface-projects-llama-2-7b-chat.hf.space",
     });
-
-    // Data sent to LLM server
-    const payload = {
-      data: [
-        'Write an ordered list of songs in the format ["SONG NAME" (AUTHOR)] according to the prompt "' // Main prompt
-        + route.params.prompt + '". Do not write descriptions or give additional commentary. Do not repeat songs.',
-        null,
-        '', // System prompt
-        2048, // Max tokens for response
-        0.1,
-        0.05,
-        1,
-        1,
-      ],
-      fn_index: 11, // chat function index
-      session_hash: uuid()
-    }
     
     // Continually probe for finished response
-    function predict(callback, lastoutput='') {
+    function predict(payload, callback, lastoutput='') {
       gradio.post('/--replicas/gm5p8/api/predict/', payload).then(result => {
         if (result.data.is_generating){
           console.log(result.data.data[0]);
-          predict(callback, result.data.data[0]);
+          predict(payload, callback, result.data.data[0]);
         } else {
           callback(lastoutput);
         }
       });
     }
 
+    // Data sent to LLM server
+    const songPayload = {
+      data: [
+        'Write an ordered list of songs in the format ["SONG NAME" (AUTHOR)] according to the prompt "' // Main prompt
+        + route.params.prompt + '". Do not write descriptions or give additional commentary. Do not repeat songs.'
+        + ' Use the full length name of the song, and ensure that the author is correct.'
+        + ' Only supply the main author, do not include additional. Do not make up or imagine songs.',
+        null,
+        '', // System prompt
+        2048, // Max tokens for response
+        0.9, // Temperature
+        0.05, // Top-P
+        1, // Top-K
+        1, // Repitition Penalty
+      ],
+      fn_index: 11, // chat function index
+      session_hash: uuid()
+    }
+
     // Sent data to server and parse results
-    predict(result => {
+    predict(songPayload, result => {
       const matches = result.match(/\".*?\".*?\(.*?\)/g);
       if (!matches) {
         const matches = result.match(/\".*?\" by .*?\n/g);
@@ -99,24 +105,73 @@ export default function Results({ route, navigation }) {
             .then((data) => {
               let found = false;
               data.data.tracks.items.forEach((slice) => {
-                if (
-                  !found &&
-                  slice.artists[0].name
-                    .toLowerCase()
-                    .replaceAll(/\s|(the)/g, "") ===
-                    song.author.toLowerCase().replaceAll(/\s|(the)/g, "")
+                if ( !found &&
+                  song.author.toLowerCase().includes(slice.artists[0].name
+                      .toLowerCase()
+                      .replaceAll(/the/g, "")
+                      .split(' ')[0]
+                    )
                 ) {
-                  setTracks((old) => [...old, slice]);
+                  setTracks((old) => {
+                    let f = false;
+                    old.forEach((s)=>{
+                      if (!f && s.id == slice.id) {
+                        f = true;
+                      }
+                    });
+                    if (f) {
+                      return old;
+                    }
+                    return [...old, slice];
+                  });
                   found = true;
                 }
               });
               if (!found) {
-                setTracks((old) => [...old, data.data.tracks.items[0]]);
+                setTracks((old) => {
+                  let f = false;
+                  old.forEach((s)=>{
+                    if (!f && s.id == data.data.tracks.items[0].id) {
+                      f = true;
+                    }
+                  });
+                  if (f) {
+                    return old;
+                  }
+                  return [...old, data.data.tracks.items[0]];
+                });
               }
             });
         });
       });
     });
+
+    // Data sent to LLM server
+    const infoPayload = {
+      data: [
+        'Write a creatively accurate name and description for a playlist that was made according to the prompt "' // Main prompt
+        + route.params.prompt + '". Please response in a JSON format, i.e. {"name": "[NAME]", description: "[DESCRIPTION]"}.'
+        + ' Do not give additional commentary besides the requested info. Limit the name to less than 7 words, and the'
+        + ' description to less than 50. However, also ensure the description does not cut off, and is complete. Avoid using cheesy terms like "Jams" or "Vibes".',
+        null,
+        '', // System prompt
+        1024, // Max tokens for response
+        0.9, // Temperature
+        0.05, // Top-P
+        1, // Top-K
+        1, // Repitition Penalty
+      ],
+      fn_index: 11, // chat function index
+      session_hash: uuid()
+    }
+
+    predict(infoPayload, result => {
+      let out = JSON.parse('{' + result.split('{')[1].split('}')[0] + '}')
+      if (out.name && out.description) {
+        setInfo(out);
+      }
+    });
+
   }, []);
 
   function makePlaylist() {
@@ -124,8 +179,8 @@ export default function Results({ route, navigation }) {
       AsyncStorage.getItem("SpotifyID").then((id) => {
         axios.post("https://api.spotify.com/v1/users/"+id+"/playlists", 
           {
-            name: "SpotOn Generated Playlist",
-            description: 'This playlist was generated with SpotOn using the prompt "' + route.params.prompt + '". Feel free to change the name and description to your liking!',
+            name: info.name,
+            description: info.description,
             public: false,
           },
           {
@@ -159,7 +214,8 @@ export default function Results({ route, navigation }) {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         {tracks.length > 0 ? (
           <View style={styles.header}>
-            <Text style={styles.text}>Say hello to your new playlist!</Text>
+            <Text style={styles.maintext}>{info.name}</Text>
+            <Text style={styles.desctext}>{info.description}</Text>
             <TouchableOpacity style={styles.spotifybutton} onPress={makePlaylist}>
               <Text style={{fontWeight: "bold"}}>Send to Spotify</Text>
             </TouchableOpacity>
@@ -192,20 +248,23 @@ export default function Results({ route, navigation }) {
         ) : (
           <View style={styles.border}>
             <LottieView
-              // style={styles.lottie}
               style={{
                 width: 300,
                 height: 300,
                 justifyContent: "center",
                 alignItems: "center",
+                flex: 1
               }}
               source={require("../assets/lottie.json")}
               autoPlay
               loop
             />
-            <Text style={styles.loadertext}>
-              We are preparing your playlist
-            </Text>
+            <View style={{flexDirection: "row", alignItems: "center"}}>
+              <Text style={styles.loadertext}>
+                Hold tight! Making your new playlist...  
+              </Text>
+              <ActivityIndicator></ActivityIndicator>
+            </View>
           </View>
         )}
       </ScrollView>
@@ -221,8 +280,23 @@ const styles = StyleSheet.create({
     backgroundColor: globals.colors.base.primary,
     paddingHorizontal: 5,
   },
+  maintext: {
+    color: globals.colors.text.primary,
+    flex: 1, 
+    flexWrap: 'wrap',
+    fontSize: 20,
+    marginBottom: 10
+  },
+  desctext: {
+    color: globals.colors.text.secondary,
+    flex: 1, 
+    flexWrap: 'wrap',
+    textAlign: 'center'
+  },
   text: {
     color: globals.colors.text.primary,
+    flex: 1, 
+    flexWrap: 'wrap'
   },
   loadertext: {
     color: globals.colors.text.primary,
@@ -230,6 +304,11 @@ const styles = StyleSheet.create({
   },
   text2: {
     color: globals.colors.text.secondary,
+    flex: 1, 
+    flexWrap: 'wrap'
+  },
+  container2: {
+    width: "75%",
   },
   image: {
     height: 50,
@@ -242,7 +321,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     marginBottom: 20,
-    marginTop: 40,
+    marginTop: 40
   },
   trackContainer: {
     flexDirection: "row", // Arrange image and text in a row
