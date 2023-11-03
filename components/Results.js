@@ -6,10 +6,12 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
+  Alert
 } from "react-native";
 import LottieView from "lottie-react-native";
 import SafeAreaView from "react-native-safe-area-view";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState, useRef } from "react";
 import * as Linking from "expo-linking";
 import axios from "axios";
@@ -98,6 +100,8 @@ export default function Results({ route, navigation }) {
           .filter((song) => song.name && song.name !== "SONG NAME");
       }
 
+      let error = false;
+
       // Lookup each song on spotify
       songs.forEach((song) => {
         console.log(song.name);
@@ -111,8 +115,15 @@ export default function Results({ route, navigation }) {
                 q: song.name,
                 type: "track",
               },
+            }).catch(() => {
+              if (error) {return;}
+              error = true;
+              Alert.alert('Whoopsies!', 'Sorry, it looks like there\'s something wrong with Spotify. Try disconnecting and reconnecting', [
+                {text: 'Go Home', onPress: () => navigation.navigate('Home')},
+              ]);
             })
             .then((data) => {
+              if (error) {return;}
               let found = false;
               data.data.tracks.items.forEach((slice) => {
                 if (
@@ -270,6 +281,21 @@ export default function Results({ route, navigation }) {
                   {track.album.release_date.split("-")[0]}
                 </Text>
               </View>
+              <TouchableOpacity
+                //style={styles.spotifybutton}
+                onPress={() => {
+                  setTracks((old) => {
+                    var ind = old.map(i => i.id).indexOf(track.id);
+                    if (~ind) {
+                      old.splice(ind, 1)
+                      return old.splice(0); // Updates view
+                    }
+                    return old; // No update view
+                  });
+                }}
+              >
+                <Ionicons name="trash-outline" size={25} color={globals.colors.text.secondary} />
+              </TouchableOpacity>
             </View>
           ))
         ) : (
