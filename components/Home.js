@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import * as Linking from "expo-linking";
-import SafeAreaView from 'react-native-safe-area-view';
+import SafeAreaView from "react-native-safe-area-view";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as WebBrowser from "expo-web-browser";
 import { ResponseType, useAuthRequest } from "expo-auth-session";
@@ -44,7 +44,11 @@ export default function Home({ navigation }) {
     {
       responseType: ResponseType.Token,
       clientId: "8f0bb8f5fa3a43ceb0c4a669d403f1f1",
-      scopes: ["user-read-email", "playlist-modify-public", "playlist-modify-private"],
+      scopes: [
+        "user-read-email",
+        "playlist-modify-public",
+        "playlist-modify-private",
+      ],
       usePKCE: false,
       redirectUri: Linking.createURL(),
     },
@@ -55,19 +59,21 @@ export default function Home({ navigation }) {
     if (response?.type === "success") {
       setToken(response.params.access_token);
       AsyncStorage.setItem("token", response.params.access_token);
-      axios.get("https://api.spotify.com/v1/me", {
-        headers: {
-          Authorization: `Bearer ${response.params.access_token}`,
-        },
-        params: {},
-      }).then((data) => {
-        AsyncStorage.setItem("SpotifyName", data.data.display_name);
-        AsyncStorage.setItem("SpotifyUrl", data.data.external_urls.spotify);
-        AsyncStorage.setItem("SpotifyID", data.data.id);
-        AsyncStorage.setItem("SpotifyPhoto", data.data.images[0].url);
-        setPhoto(data.data.images[0].url);
-        setURL(data.data.external_urls.spotify);
-      });
+      axios
+        .get("https://api.spotify.com/v1/me", {
+          headers: {
+            Authorization: `Bearer ${response.params.access_token}`,
+          },
+          params: {},
+        })
+        .then((data) => {
+          AsyncStorage.setItem("SpotifyName", data.data.display_name);
+          AsyncStorage.setItem("SpotifyUrl", data.data.external_urls.spotify);
+          AsyncStorage.setItem("SpotifyID", data.data.id);
+          AsyncStorage.setItem("SpotifyPhoto", data.data.images[0].url);
+          setPhoto(data.data.images[0].url);
+          setURL(data.data.external_urls.spotify);
+        });
     }
   }, [response]);
 
@@ -103,7 +109,7 @@ export default function Home({ navigation }) {
                 navigation.navigate("Results", { prompt: prompt });
               }}
             >
-              <Text style={{fontWeight: "bold"}}>Go</Text>
+              <Text style={{ fontWeight: "bold" }}>Go</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.smallparent}>
@@ -115,22 +121,31 @@ export default function Home({ navigation }) {
                     promptAsync();
                   }}
                 >
-                  <Text style={{fontWeight: "bold"}}>Connect</Text>
+                  <Text style={{ fontWeight: "bold" }}>Connect</Text>
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity style={styles.spotifybutton} onPress={logout}>
-                  <Text style={{fontWeight: "bold"}}>Disconnect</Text>
+                  <Text style={{ fontWeight: "bold" }}>Disconnect</Text>
                 </TouchableOpacity>
               )}
             </View>
-            { !photo ? <></> : 
-              <TouchableOpacity onPress={() => {Linking.openURL(url);}}>
-                <Image style={styles.image} source={{uri: photo}}/>
+            {!photo ? (
+              <></>
+            ) : (
+              <TouchableOpacity
+                onPress={() => {
+                  Linking.openURL(url);
+                }}
+              >
+                <Image style={styles.image} source={{ uri: photo }} />
               </TouchableOpacity>
-            }
+            )}
           </View>
         </View>
       </View>
+      {/* <View style={styles.navbar}>
+        <Text>navbar</Text>
+      </View> */}
     </SafeAreaView>
   );
 }
@@ -203,5 +218,8 @@ const styles = StyleSheet.create({
     width: 30,
     marginLeft: 10,
     borderRadius: 25,
+  },
+  navbar: {
+    backgroundColor: globals.colors.base.secondary,
   },
 });

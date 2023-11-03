@@ -5,22 +5,26 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import LottieView from "lottie-react-native";
 import SafeAreaView from "react-native-safe-area-view";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import * as Linking from "expo-linking";
 import axios from "axios";
 import uuid from "react-uuid";
 import globals from "../Globals";
 
 export default function Results({ route, navigation }) {
+  const animationRef = useRef(null);
   const [tracks, setTracks] = useState([]);
   const [info, setInfo] = useState({
-    name: 'SpotOn Generated Playlist', 
-    description: 'This playlist was generated with SpotOn using the prompt "' + route.params.prompt + '". Feel free to change the name and description to your liking!'
+    name: "SpotOn Generated Playlist",
+    description:
+      'This playlist was generated with SpotOn using the prompt "' +
+      route.params.prompt +
+      '". Feel free to change the name and description to your liking!',
   });
 
   useEffect(() => {
@@ -30,11 +34,11 @@ export default function Results({ route, navigation }) {
     const gradio = axios.create({
       baseURL: "https://huggingface-projects-llama-2-7b-chat.hf.space",
     });
-    
+
     // Continually probe for finished response
-    function predict(payload, callback, lastoutput='') {
-      gradio.post('/--replicas/gm5p8/api/predict/', payload).then(result => {
-        if (result.data.is_generating){
+    function predict(payload, callback, lastoutput = "") {
+      gradio.post("/--replicas/gm5p8/api/predict/", payload).then((result) => {
+        if (result.data.is_generating) {
           console.log(result.data.data[0]);
           predict(payload, callback, result.data.data[0]);
         } else {
@@ -46,12 +50,13 @@ export default function Results({ route, navigation }) {
     // Data sent to LLM server
     const songPayload = {
       data: [
-        'Write an ordered list of songs in the format ["SONG NAME" (AUTHOR)] according to the prompt "' // Main prompt
-        + route.params.prompt + '". Do not write descriptions or give additional commentary. Do not repeat songs.'
-        + ' Use the full length name of the song, and ensure that the author is correct.'
-        + ' Only supply the main author, do not include additional. Do not make up or imagine songs.',
+        'Write an ordered list of songs in the format ["SONG NAME" (AUTHOR)] according to the prompt "' + // Main prompt
+          route.params.prompt +
+          '". Do not write descriptions or give additional commentary. Do not repeat songs.' +
+          " Use the full length name of the song, and ensure that the author is correct." +
+          " Only supply the main author, do not include additional. Do not make up or imagine songs.",
         null,
-        '', // System prompt
+        "", // System prompt
         2048, // Max tokens for response
         0.9, // Temperature
         0.05, // Top-P
@@ -59,25 +64,30 @@ export default function Results({ route, navigation }) {
         1, // Repitition Penalty
       ],
       fn_index: 11, // chat function index
-      session_hash: uuid()
-    }
+      session_hash: uuid(),
+    };
 
     // Sent data to server and parse results
-    predict(songPayload, result => {
+    predict(songPayload, (result) => {
       const matches = result.match(/\".*?\".*?\(.*?\)/g);
       if (!matches) {
         const matches = result.match(/\".*?\" by .*?\n/g);
         if (!matches) {
           const matches = result.match(/.*?\s*\(.*?\)\n/g);
-          var songs = matches.map(match => {
-            const [, name, author] = /(.*?)\s*\((.*?)\)\n/g.exec(match) || '';
-            return { name, author };
-          }).filter(song => song.name && song.name !== 'SONG NAME');
+          var songs = matches
+            .map((match) => {
+              const [, name, author] = /(.*?)\s*\((.*?)\)\n/g.exec(match) || "";
+              return { name, author };
+            })
+            .filter((song) => song.name && song.name !== "SONG NAME");
         } else {
-          var songs = matches.map(match => {
-            const [, name, author] = /\"(.*?)\" by (.*?)\n/g.exec(match) || '';
-            return { name, author };
-          }).filter(song => song.name && song.name !== 'SONG NAME');
+          var songs = matches
+            .map((match) => {
+              const [, name, author] =
+                /\"(.*?)\" by (.*?)\n/g.exec(match) || "";
+              return { name, author };
+            })
+            .filter((song) => song.name && song.name !== "SONG NAME");
         }
       } else {
         var songs = matches
@@ -89,7 +99,7 @@ export default function Results({ route, navigation }) {
       }
 
       // Lookup each song on spotify
-      songs.forEach(song => {
+      songs.forEach((song) => {
         console.log(song.name);
         AsyncStorage.getItem("token").then((token) => {
           axios
@@ -105,16 +115,20 @@ export default function Results({ route, navigation }) {
             .then((data) => {
               let found = false;
               data.data.tracks.items.forEach((slice) => {
-                if ( !found &&
-                  song.author.toLowerCase().includes(slice.artists[0].name
-                      .toLowerCase()
-                      .replaceAll(/the/g, "")
-                      .split(' ')[0]
+                if (
+                  !found &&
+                  song.author
+                    .toLowerCase()
+                    .includes(
+                      slice.artists[0].name
+                        .toLowerCase()
+                        .replaceAll(/the/g, "")
+                        .split(" ")[0]
                     )
                 ) {
                   setTracks((old) => {
                     let f = false;
-                    old.forEach((s)=>{
+                    old.forEach((s) => {
                       if (!f && s.id == slice.id) {
                         f = true;
                       }
@@ -130,7 +144,7 @@ export default function Results({ route, navigation }) {
               if (!found) {
                 setTracks((old) => {
                   let f = false;
-                  old.forEach((s)=>{
+                  old.forEach((s) => {
                     if (!f && s.id == data.data.tracks.items[0].id) {
                       f = true;
                     }
@@ -149,12 +163,13 @@ export default function Results({ route, navigation }) {
     // Data sent to LLM server
     const infoPayload = {
       data: [
-        'Write a creatively accurate name and description for a playlist that was made according to the prompt "' // Main prompt
-        + route.params.prompt + '". Please response in a JSON format, i.e. {"name": "[NAME]", description: "[DESCRIPTION]"}.'
-        + ' Do not give additional commentary besides the requested info. Limit the name to less than 7 words, and the'
-        + ' description to less than 50. However, also ensure the description does not cut off, and is complete. Avoid using cheesy terms like "Jams" or "Vibes".',
+        'Write a creatively accurate name and description for a playlist that was made according to the prompt "' + // Main prompt
+          route.params.prompt +
+          '". Please response in a JSON format, i.e. {"name": "[NAME]", description: "[DESCRIPTION]"}.' +
+          " Do not give additional commentary besides the requested info. Limit the name to less than 7 words, and the" +
+          ' description to less than 50. However, also ensure the description does not cut off, and is complete. Avoid using cheesy terms like "Jams" or "Vibes".',
         null,
-        '', // System prompt
+        "", // System prompt
         1024, // Max tokens for response
         0.9, // Temperature
         0.05, // Top-P
@@ -162,49 +177,58 @@ export default function Results({ route, navigation }) {
         1, // Repitition Penalty
       ],
       fn_index: 11, // chat function index
-      session_hash: uuid()
-    }
+      session_hash: uuid(),
+    };
 
-    predict(infoPayload, result => {
-      let out = JSON.parse('{' + result.split('{')[1].split('}')[0] + '}')
+    predict(infoPayload, (result) => {
+      let out = JSON.parse("{" + result.split("{")[1].split("}")[0] + "}");
       if (out.name && out.description) {
         setInfo(out);
       }
     });
+  }, []);
 
+  useEffect(() => {
+    animationRef.current?.play();
   }, []);
 
   function makePlaylist() {
     AsyncStorage.getItem("token").then((token) => {
       AsyncStorage.getItem("SpotifyID").then((id) => {
-        axios.post("https://api.spotify.com/v1/users/"+id+"/playlists", 
-          {
-            name: info.name,
-            description: info.description,
-            public: false,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            }
-          }
-        )
-        .then((data) => {
-          axios.post("https://api.spotify.com/v1/playlists/"+data.data.id+"/tracks", 
+        axios
+          .post(
+            "https://api.spotify.com/v1/users/" + id + "/playlists",
             {
-              uris: tracks.map((track) => track.uri),
-              position: 0,
+              name: info.name,
+              description: info.description,
+              public: false,
             },
             {
               headers: {
                 Authorization: `Bearer ${token}`,
-              }
+              },
             }
           )
-          .then((trackdata) => {
-            Linking.openURL(data.data.external_urls.spotify);
+          .then((data) => {
+            axios
+              .post(
+                "https://api.spotify.com/v1/playlists/" +
+                  data.data.id +
+                  "/tracks",
+                {
+                  uris: tracks.map((track) => track.uri),
+                  position: 0,
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              )
+              .then((trackdata) => {
+                Linking.openURL(data.data.external_urls.spotify);
+              });
           });
-        });
       });
     });
   }
@@ -216,8 +240,11 @@ export default function Results({ route, navigation }) {
           <View style={styles.header}>
             <Text style={styles.maintext}>{info.name}</Text>
             <Text style={styles.desctext}>{info.description}</Text>
-            <TouchableOpacity style={styles.spotifybutton} onPress={makePlaylist}>
-              <Text style={{fontWeight: "bold"}}>Send to Spotify</Text>
+            <TouchableOpacity
+              style={styles.spotifybutton}
+              onPress={makePlaylist}
+            >
+              <Text style={{ fontWeight: "bold" }}>Send to Spotify</Text>
             </TouchableOpacity>
           </View>
         ) : null}
@@ -248,20 +275,21 @@ export default function Results({ route, navigation }) {
         ) : (
           <View style={styles.border}>
             <LottieView
+              ref={animationRef}
+              source={require("../assets/lottie.json")}
+              autoPlay
+              loop
               style={{
                 width: 300,
                 height: 300,
                 justifyContent: "center",
                 alignItems: "center",
-                flex: 1
+                flex: 1,
               }}
-              source={require("../assets/lottie.json")}
-              autoPlay
-              loop
             />
-            <View style={{flexDirection: "row", alignItems: "center"}}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text style={styles.loadertext}>
-                Hold tight! Making your new playlist...  
+                Hold tight! Making your new playlist...
               </Text>
               <ActivityIndicator></ActivityIndicator>
             </View>
@@ -282,21 +310,21 @@ const styles = StyleSheet.create({
   },
   maintext: {
     color: globals.colors.text.primary,
-    flex: 1, 
-    flexWrap: 'wrap',
+    flex: 1,
+    flexWrap: "wrap",
     fontSize: 20,
-    marginBottom: 10
+    marginBottom: 10,
   },
   desctext: {
     color: globals.colors.text.secondary,
-    flex: 1, 
-    flexWrap: 'wrap',
-    textAlign: 'center'
+    flex: 1,
+    flexWrap: "wrap",
+    textAlign: "center",
   },
   text: {
     color: globals.colors.text.primary,
-    flex: 1, 
-    flexWrap: 'wrap'
+    flex: 1,
+    flexWrap: "wrap",
   },
   loadertext: {
     color: globals.colors.text.primary,
@@ -304,8 +332,8 @@ const styles = StyleSheet.create({
   },
   text2: {
     color: globals.colors.text.secondary,
-    flex: 1, 
-    flexWrap: 'wrap'
+    flex: 1,
+    flexWrap: "wrap",
   },
   container2: {
     width: "75%",
@@ -321,7 +349,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     marginBottom: 20,
-    marginTop: 40
+    marginTop: 40,
   },
   trackContainer: {
     flexDirection: "row", // Arrange image and text in a row
@@ -357,6 +385,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingLeft: 7,
     paddingRight: 7,
-    marginTop: 20
+    marginTop: 20,
   },
 });
