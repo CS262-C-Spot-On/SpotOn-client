@@ -1,16 +1,49 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { setBackgroundColorAsync } from 'expo-system-ui';
-import { StatusBar } from 'expo-status-bar';
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { setBackgroundColorAsync } from "expo-system-ui";
+import { StatusBar } from "expo-status-bar";
 import SignUpScreen from "./components/SignUp";
 import LogInScreen from "./components/LogIn";
 import HomeScreen from "./components/Home";
 import ResultsScreen from "./components/Results";
 import globals from "./Globals";
+import { Ionicons } from "@expo/vector-icons";
 
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+function HomeTabs() {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          if (route.name === "Home") {
+            iconName = focused ? "ios-home" : "ios-home-outline";
+          } else if (route.name === "Results") {
+            iconName = focused ? "ios-list" : "ios-list-outline";
+          }
+
+          // You can return any component that you like here!
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: globals.colors.text.primary,
+        tabBarInactiveTintColor: "gray",
+        tabBarStyle: { backgroundColor: globals.colors.base.secondary },
+      })}
+    >
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
+      {/* <Tab.Screen name="Results" component={ResultsScreen} /> */}
+    </Tab.Navigator>
+  );
+}
 export default function App() {
-  const Stack = createStackNavigator();
-
   setBackgroundColorAsync(globals.colors.base.primary);
 
   const forFade = ({ current, closing }) => ({
@@ -34,8 +67,8 @@ export default function App() {
           options={{ headerShown: false, cardStyleInterpolator: forFade }}
         />
         <Stack.Screen
-          name="Home"
-          component={HomeScreen}
+          name="HomeTabs"
+          component={HomeTabs}
           options={{ headerShown: false, cardStyleInterpolator: forFade }}
         />
         <Stack.Screen

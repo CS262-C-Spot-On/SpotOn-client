@@ -56,7 +56,7 @@ export default function LogIn({ navigation }) {
             <TouchableOpacity
               style={styles.loginbutton}
               onPress={() => {
-                navigation.navigate("Home");
+                navigation.navigate("HomeTabs", { screen: "Home" });
               }}
             >
               <Text style={styles.logintext}>Log In</Text>
@@ -137,6 +137,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   textinput: {
-    color: globals.colors.text.primary
+    color: globals.colors.text.primary,
   },
 });
