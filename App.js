@@ -7,6 +7,7 @@ import SignUpScreen from "./components/SignUp";
 import LogInScreen from "./components/LogIn";
 import HomeScreen from "./components/Home";
 import ResultsScreen from "./components/Results";
+import SettingsScreen from "./components/Settings";
 import globals from "./Globals";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -22,7 +23,7 @@ function HomeTabs() {
 
           if (route.name === "Home") {
             iconName = focused ? "ios-home" : "ios-home-outline";
-          } else if (route.name === "Results") {
+          } else if (route.name === "Settings") {
             iconName = focused ? "ios-list" : "ios-list-outline";
           }
 
@@ -37,6 +38,11 @@ function HomeTabs() {
       <Tab.Screen
         name="Home"
         component={HomeScreen}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={SettingsScreen}
         options={{ headerShown: false }}
       />
       {/* <Tab.Screen name="Results" component={ResultsScreen} /> */}
@@ -68,6 +74,11 @@ export default function App() {
         />
         <Stack.Screen
           name="HomeTabs"
+          component={HomeTabs}
+          options={{ headerShown: false, cardStyleInterpolator: forFade }}
+        />
+        <Stack.Screen
+          name="SettingsTabs"
           component={HomeTabs}
           options={{ headerShown: false, cardStyleInterpolator: forFade }}
         />
