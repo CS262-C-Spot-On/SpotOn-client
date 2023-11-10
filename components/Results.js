@@ -23,6 +23,7 @@ export default function Results({ route, navigation }) {
   const animationRef = useRef(null);
   const [tracks, setTracks] = useState([]);
   const [loaded, setLoaded] = useState(null);
+  const [sending, setSending] = useState(false);
   const [info, setInfo] = useState({
     name: "SpotOn Generated Playlist",
     description:
@@ -225,6 +226,7 @@ export default function Results({ route, navigation }) {
   }, []);
 
   function makePlaylist() {
+    setSending(true);
     AsyncStorage.getItem("token").then((token) => {
       AsyncStorage.getItem("SpotifyID").then((id) => {
         axios
@@ -258,7 +260,10 @@ export default function Results({ route, navigation }) {
                 }
               )
               .then((trackdata) => {
-                Linking.openURL(data.data.external_urls.spotify);
+                setTimeout(() => {
+                  setSending(false);
+                  Linking.openURL(data.data.external_urls.spotify);
+                }, 1500)
               });
           });
       });
@@ -276,7 +281,13 @@ export default function Results({ route, navigation }) {
               style={styles.spotifybutton}
               onPress={makePlaylist}
             >
-              <Text style={{ fontWeight: "bold" }}>Send to Spotify</Text>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text style={{ fontWeight: "bold", marginRight: 3 }}>Send to Spotify</Text>
+                { sending
+                  ? <ActivityIndicator></ActivityIndicator>
+                  : null
+                }
+              </View>
             </TouchableOpacity>
           </View>
         ) : null}
