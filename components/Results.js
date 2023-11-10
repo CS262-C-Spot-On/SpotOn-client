@@ -17,10 +17,12 @@ import * as Linking from "expo-linking";
 import axios from "axios";
 import uuid from "react-uuid";
 import globals from "../Globals";
+import * as Progress from 'react-native-progress';
 
 export default function Results({ route, navigation }) {
   const animationRef = useRef(null);
   const [tracks, setTracks] = useState([]);
+  const [loaded, setLoaded] = useState(null);
   const [info, setInfo] = useState({
     name: "SpotOn Generated Playlist",
     description:
@@ -38,11 +40,13 @@ export default function Results({ route, navigation }) {
     });
 
     // Continually probe for finished response
-    function predict(payload, callback, lastoutput = "") {
+    function predict(payload, callback, lastoutput = "", tempcallback = null) {
       gradio.post("/--replicas/gm5p8/api/predict/", payload).then((result) => {
         if (result.data.is_generating) {
-          console.log(result.data.data[0]);
-          predict(payload, callback, result.data.data[0]);
+          if (tempcallback) {
+            tempcallback(result.data.data[0]);
+          }
+          predict(payload, callback, result.data.data[0], tempcallback);
         } else {
           callback(lastoutput);
         }
@@ -169,6 +173,23 @@ export default function Results({ route, navigation }) {
             });
         });
       });
+    }, "", (t) => {
+      console.log(t);
+      const matches = t.match(/[0-9]+/g);
+      // console.log(matches);
+      if (!matches || matches.length < 1 || matches[0] == "1") {
+        return;
+      }
+      var max = parseInt(matches[0]);
+      var top = 0;
+      var count = 1;
+      while (count < matches.length) {
+        if (matches[count] == top + 1) {
+          top++;
+        }
+        count++;
+      }
+      setLoaded([top, max]);
     });
 
     // Data sent to LLM server
@@ -300,24 +321,33 @@ export default function Results({ route, navigation }) {
           ))
         ) : (
           <View style={styles.border}>
-            <LottieView
-              ref={animationRef}
-              source={require("../assets/lottie.json")}
-              autoPlay
-              loop
-              style={{
-                width: 300,
-                height: 300,
-                justifyContent: "center",
-                alignItems: "center",
-                flex: 1,
-              }}
-            />
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View style={{
+                  width: 300,
+                  height: 300,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flex: 1,
+                }}>
+              <LottieView
+                ref={animationRef}
+                source={require("../assets/lottie.json")}
+                autoPlay
+                loop
+              />
+            </View>
+            <View style={{ flexDirection: "column", alignItems: "center" }}>
               <Text style={styles.loadertext}>
                 Hold tight! Making your new playlist...
               </Text>
-              <ActivityIndicator></ActivityIndicator>
+              { loaded
+                ? <View>
+                    <Progress.Bar color={ globals.colors.base.accent } progress={loaded[0] / loaded[1]} width={200} />
+                    <Text style={styles.loadertext}>
+                      {loaded[0]}/{loaded[1]}
+                    </Text>
+                  </View>
+                : <ActivityIndicator></ActivityIndicator>
+              }
             </View>
           </View>
         )}
@@ -355,6 +385,7 @@ const styles = StyleSheet.create({
   loadertext: {
     color: globals.colors.text.primary,
     alignSelf: "center",
+    margin: 5
   },
   text2: {
     color: globals.colors.text.secondary,
