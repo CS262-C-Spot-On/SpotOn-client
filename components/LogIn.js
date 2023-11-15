@@ -12,6 +12,37 @@ import {
 export default function LogIn({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    try {
+      // Fetch user data from the server
+      const response = await fetch('https://spot-on.azurewebsites.net/users');
+      const userData = await response.json();
+
+      // Check if the email is present in the records
+      const userRecord = userData.find(
+        (user) => user.emailaddress === email
+      );
+
+      if (userRecord) {
+        // Check if the password matches
+        if (userRecord.password === password) {
+          // Authentication successful
+          navigation.navigate('HomeTabs', { screen: 'Home' });
+        } else {
+          // Password doesn't match
+          alert('Error: Incorrect password');
+        }
+      } else {
+        // Email not found in records
+        alert('Error: Email not found');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error: Login failed');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.phone}>
       <View style={styles.container}>
@@ -56,7 +87,7 @@ export default function LogIn({ navigation }) {
             <TouchableOpacity
               style={styles.loginbutton}
               onPress={() => {
-                navigation.navigate("HomeTabs", { screen: "Home" });
+                handleLogin();
               }}
             >
               <Text style={styles.logintext}>Log In</Text>
