@@ -15,6 +15,36 @@ export default function SignUp({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const handleSignup = async () => {
+    // Create a user object with the entered data
+    const user = {
+      users_name: name,
+      emailAddress: email,
+      password: password
+    };
+
+    try {
+      // Send a POST request to your API endpoint
+      const response = await fetch('https://spot-on.azurewebsites.net/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (response.ok) {
+        // User registration was successful
+        navigation.navigate('LogIn'); // Redirect to the login screen
+      } else {
+        alert('Error: Registration failed');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error: Registration failed');
+    }
+
+  };
   return (
     <SafeAreaView style={styles.phone}>
       <View style={styles.container}>
@@ -68,7 +98,7 @@ export default function SignUp({ navigation }) {
             <TouchableOpacity
               style={styles.subutton}
               onPress={() => {
-                navigation.navigate("LogIn");
+                handleSignup(); // Corrected
               }}
             >
               <Text style={styles.signup}>Sign up</Text>
