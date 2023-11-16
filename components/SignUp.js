@@ -16,11 +16,24 @@ export default function SignUp({ navigation }) {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const handleSignup = async () => {
+    // Check if the email is in the right format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert('Error: Please enter a valid email address');
+      return;
+    }
+
+    // Check if the password is at least 8 characters long
+    if (password.length < 8) {
+      alert('Error: Password must be at least 8 characters long');
+      return;
+    }
+
     // Create a user object with the entered data
     const user = {
       users_name: name,
       emailAddress: email,
-      password: password
+      password: password,
     };
 
     try {
@@ -43,7 +56,6 @@ export default function SignUp({ navigation }) {
       console.error(error);
       alert('Error: Registration failed');
     }
-
   };
   return (
     <SafeAreaView style={styles.phone}>

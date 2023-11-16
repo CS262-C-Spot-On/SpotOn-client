@@ -7,6 +7,7 @@ import {
   TextInput,
   Pressable,
   TouchableOpacity,
+  Alert
 } from "react-native";
 
 export default function LogIn({ navigation }) {

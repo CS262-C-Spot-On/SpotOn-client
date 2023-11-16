@@ -2495,6 +2495,11 @@ ajv@^8.8.2, ajv@^8.9.0:
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
+alert@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.npmjs.org/alert/-/alert-6.0.1.tgz"
+  integrity sha512-7ZPECX89zu30g+83dDs487Dyw3ZxtZmsyQdUFP+07CNHp+xf/YOJvb3YZx4r5alLyCbftehbHj1Udbpmj9MICw==
+
 anser@^1.4.9:
   version "1.4.10"
   resolved "https://registry.npmjs.org/anser/-/anser-1.4.10.tgz"
