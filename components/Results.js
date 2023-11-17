@@ -24,6 +24,7 @@ export default function Results({ route, navigation }) {
   const [tracks, setTracks] = useState([]);
   const [loaded, setLoaded] = useState(null);
   const [sending, setSending] = useState(false);
+  const [adding, setAdding] = useState(false);
   const [info, setInfo] = useState({
     name: "SpotOn Generated Playlist",
     description:
@@ -32,27 +33,27 @@ export default function Results({ route, navigation }) {
       '". Feel free to change the name and description to your liking!',
   });
 
+  // Inital Llama2-chat connection
+  const gradio = axios.create({
+    baseURL: "https://huggingface-projects-llama-2-7b-chat.hf.space",
+  });
+
+  // Continually probe for finished response
+  function predict(payload, callback, lastoutput = "", tempcallback = null) {
+    gradio.post("/--replicas/gm5p8/api/predict/", payload).then((result) => {
+      if (result.data.is_generating) {
+        if (tempcallback) {
+          tempcallback(result.data.data[0]);
+        }
+        predict(payload, callback, result.data.data[0], tempcallback);
+      } else {
+        callback(lastoutput);
+      }
+    });
+  }
+
   useEffect(() => {
     setTracks([]);
-
-    // Inital Llama2-chat connection
-    const gradio = axios.create({
-      baseURL: "https://huggingface-projects-llama-2-7b-chat.hf.space",
-    });
-
-    // Continually probe for finished response
-    function predict(payload, callback, lastoutput = "", tempcallback = null) {
-      gradio.post("/--replicas/gm5p8/api/predict/", payload).then((result) => {
-        if (result.data.is_generating) {
-          if (tempcallback) {
-            tempcallback(result.data.data[0]);
-          }
-          predict(payload, callback, result.data.data[0], tempcallback);
-        } else {
-          callback(lastoutput);
-        }
-      });
-    }
 
     // Data sent to LLM server
     const songPayload = {
@@ -198,8 +199,8 @@ export default function Results({ route, navigation }) {
       data: [
         'Write a creatively accurate name and description for a playlist that was made according to the prompt "' + // Main prompt
           route.params.prompt +
-          '". Please response in a JSON format, i.e. {"name": "[NAME]", description: "[DESCRIPTION]"}.' +
-          " Do not give additional commentary besides the requested info. Limit the name to less than 7 words, and the" +
+          '". Please response in a JSON format, i.e. {"name": "[NAME]", "description": "[DESCRIPTION]"}.' +
+          " Do not give additional commentary besides the requested information. Limit the name to less than 7 words, and the" +
           ' description to less than 50. However, also ensure the description does not cut off, and is complete. Avoid using cheesy terms like "Jams" or "Vibes".',
         null,
         "", // System prompt
@@ -220,6 +221,99 @@ export default function Results({ route, navigation }) {
       }
     });
   }, []);
+
+  function addSong() {
+    setAdding(true);
+    const infoPayload = {
+      data: [
+        'Suggest a single new song that fits well in concept and genre to the following playlist [' + // Main prompt
+          tracks.map((track) => '{"song": "'+track.name+'", "artist": "'+track.artists[0].name+'"}').join(', ') +
+          '] Please response in a JSON format, i.e. {"song": "[SONG]", "artist": "[ARTIST]"}.' +
+          " Do not provide additional commentary, only the requested information. Be concise and accurate." +
+          ' Ensure that the artist is truly the author of the song. Do not suggest a song already in the playlist.',
+        null,
+        "", // System prompt
+        256, // Max tokens for response
+        0.9, // Temperature
+        0.05, // Top-P
+        1, // Top-K
+        1, // Repitition Penalty
+      ],
+      fn_index: 11, // chat function index
+      session_hash: uuid(),
+    };
+
+    predict(infoPayload, (result) => {
+      setAdding(false);
+      let error = false;
+      let out = JSON.parse("{" + result.split("{")[1].split("}")[0] + "}");
+      if (out.song && out.artist) {
+        AsyncStorage.getItem("token").then((token) => {
+          axios
+            .get("https://api.spotify.com/v1/search", {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              params: {
+                q: out.song,
+                type: "track",
+              },
+            }).catch(() => {
+              if (error) {return;}
+              error = true;
+              Alert.alert('Whoopsies!', 'Sorry, it looks like there\'s something wrong with Spotify. Try disconnecting and reconnecting', [
+                {text: 'Go Home', onPress: () => navigation.navigate('Home')},
+              ]);
+            })
+            .then((data) => {
+              if (error) {return;}
+              let found = false;
+              data.data.tracks.items.forEach((slice) => {
+                if (
+                  !found &&
+                  out.artist
+                    .toLowerCase()
+                    .includes(
+                      slice.artists[0].name
+                        .toLowerCase()
+                        .replaceAll(/the/g, "")
+                        .split(" ")[0]
+                    )
+                ) {
+                  setTracks((old) => {
+                    let f = false;
+                    old.forEach((s) => {
+                      if (!f && s.id == slice.id) {
+                        f = true;
+                      }
+                    });
+                    if (f) {
+                      return old;
+                    }
+                    return [slice, ...old];
+                  });
+                  found = true;
+                }
+              });
+              if (!found) {
+                setTracks((old) => {
+                  let f = false;
+                  old.forEach((s) => {
+                    if (!f && s.id == data.data.tracks.items[0].id) {
+                      f = true;
+                    }
+                  });
+                  if (f) {
+                    return old;
+                  }
+                  return [data.data.tracks.items[0], ...old];
+                });
+              }
+            });
+        });
+      }
+    });
+  }
 
   useEffect(() => {
     animationRef.current?.play();
@@ -363,6 +457,20 @@ export default function Results({ route, navigation }) {
           </View>
         )}
       </ScrollView>
+      { tracks.length > 0 ?
+        <TouchableOpacity
+          style={styles.addbutton}
+          onPress={addSong}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={{ fontWeight: "bold", marginRight: 3 }}>Add a Song</Text>
+            { adding
+              ? <ActivityIndicator></ActivityIndicator>
+              : null
+            }
+          </View>
+        </TouchableOpacity>
+      : null }
     </SafeAreaView>
   );
 }
@@ -454,5 +562,17 @@ const styles = StyleSheet.create({
     paddingLeft: 7,
     paddingRight: 7,
     marginTop: 20,
+  },
+  addbutton: {
+    backgroundColor: globals.colors.base.accent,
+    height: 30,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingLeft: 7,
+    paddingRight: 7,
+    position: 'absolute',                                          
+    bottom: 10,                                                    
+    right: 10, 
   },
 });
