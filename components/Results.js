@@ -229,11 +229,12 @@ export default function Results({ route, navigation }) {
         'Suggest a single new song that fits well in concept and genre to the following playlist [' + // Main prompt
           tracks.map((track) => '{"song": "'+track.name+'", "artist": "'+track.artists[0].name+'"}').join(', ') +
           '] Please response in a JSON format, i.e. {"song": "[SONG]", "artist": "[ARTIST]"}.' +
-          " Do not provide additional commentary, only the requested information. Be concise and accurate." +
-          ' Ensure that the artist is truly the author of the song. Do not suggest a song already in the playlist.',
+          " Do not provide additional commentary or descriptions, only the requested information. Be concise and accurate." +
+          ' Ensure that the artist is truly the author of the song. Do not suggest a song already in the playlist.' +
+          ' MOST IMPORTANTLY, ENSURE THE JSON IS COMPLETE, with every bracket and quotation closed.',
         null,
         "", // System prompt
-        256, // Max tokens for response
+        128, // Max tokens for response
         0.9, // Temperature
         0.05, // Top-P
         1, // Top-K
@@ -246,7 +247,9 @@ export default function Results({ route, navigation }) {
     predict(infoPayload, (result) => {
       setAdding(false);
       let error = false;
+      console.log(result);
       let out = JSON.parse("{" + result.split("{")[1].split("}")[0] + "}");
+      console.log(out);
       if (out.song && out.artist) {
         AsyncStorage.getItem("token").then((token) => {
           axios
@@ -460,10 +463,10 @@ export default function Results({ route, navigation }) {
       { tracks.length > 0 ?
         <TouchableOpacity
           style={styles.addbutton}
-          onPress={addSong}
+          onPress={adding ? null : addSong}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={{ fontWeight: "bold", marginRight: 3 }}>Add a Song</Text>
+            <Text style={{ fontWeight: "bold", marginRight: 3, fontSize: 15 }}>Add a song</Text>
             { adding
               ? <ActivityIndicator></ActivityIndicator>
               : null
@@ -565,7 +568,7 @@ const styles = StyleSheet.create({
   },
   addbutton: {
     backgroundColor: globals.colors.base.accent,
-    height: 30,
+    height: 40,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
