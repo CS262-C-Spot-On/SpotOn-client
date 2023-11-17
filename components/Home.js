@@ -1,3 +1,9 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { ResponseType, useAuthRequest } from "expo-auth-session";
+import * as Linking from "expo-linking";
+import * as WebBrowser from "expo-web-browser";
+import React, { useState } from "react";
 import {
   Text,
   View,
@@ -6,51 +12,46 @@ import {
   TextInput,
   TouchableOpacity,
   Modal,
-} from 'react-native';
-import * as Linking from 'expo-linking';
-import SafeAreaView from 'react-native-safe-area-view';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as WebBrowser from 'expo-web-browser';
-import { ResponseType, useAuthRequest } from 'expo-auth-session';
-import React, { useState } from 'react';
-import axios from 'axios';
-import globals from '../Globals';
+} from "react-native";
+import SafeAreaView from "react-native-safe-area-view";
+
+import globals from "../Globals";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function Home({ navigation }) {
-  const [prompt, setPrompt] = useState('');
-  const [token, setToken] = useState('');
-  const [photo, setPhoto] = useState('');
-  const [url, setURL] = useState('');
+  const [prompt, setPrompt] = useState("");
+  const [token, setToken] = useState("");
+  const [photo, setPhoto] = useState("");
+  const [url, setURL] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
-  AsyncStorage.getItem('token').then((t) => {
+  AsyncStorage.getItem("token").then((t) => {
     setToken(t);
     setModalVisible(!t);
   });
 
-  AsyncStorage.getItem('SpotifyPhoto').then((p) => {
+  AsyncStorage.getItem("SpotifyPhoto").then((p) => {
     setPhoto(p);
   });
 
-  AsyncStorage.getItem('SpotifyUrl').then((u) => {
+  AsyncStorage.getItem("SpotifyUrl").then((u) => {
     setURL(u);
   });
 
   const discovery = {
-    authorizationEndpoint: 'https://accounts.spotify.com/authorize',
-    tokenEndpoint: 'https://accounts.spotify.com/api/token',
+    authorizationEndpoint: "https://accounts.spotify.com/authorize",
+    tokenEndpoint: "https://accounts.spotify.com/api/token",
   };
 
   const [request, response, promptAsync] = useAuthRequest(
     {
       responseType: ResponseType.Token,
-      clientId: '8f0bb8f5fa3a43ceb0c4a669d403f1f1',
+      clientId: "8f0bb8f5fa3a43ceb0c4a669d403f1f1",
       scopes: [
-        'user-read-email',
-        'playlist-modify-public',
-        'playlist-modify-private',
+        "user-read-email",
+        "playlist-modify-public",
+        "playlist-modify-private",
       ],
       usePKCE: false,
       redirectUri: Linking.createURL(),
@@ -59,21 +60,21 @@ export default function Home({ navigation }) {
   );
 
   React.useEffect(() => {
-    if (response?.type === 'success') {
+    if (response?.type === "success") {
       setToken(response.params.access_token);
-      AsyncStorage.setItem('token', response.params.access_token);
+      AsyncStorage.setItem("token", response.params.access_token);
       axios
-        .get('https://api.spotify.com/v1/me', {
+        .get("https://api.spotify.com/v1/me", {
           headers: {
             Authorization: `Bearer ${response.params.access_token}`,
           },
           params: {},
         })
         .then((data) => {
-          AsyncStorage.setItem('SpotifyName', data.data.display_name);
-          AsyncStorage.setItem('SpotifyUrl', data.data.external_urls.spotify);
-          AsyncStorage.setItem('SpotifyID', data.data.id);
-          AsyncStorage.setItem('SpotifyPhoto', data.data.images[0].url);
+          AsyncStorage.setItem("SpotifyName", data.data.display_name);
+          AsyncStorage.setItem("SpotifyUrl", data.data.external_urls.spotify);
+          AsyncStorage.setItem("SpotifyID", data.data.id);
+          AsyncStorage.setItem("SpotifyPhoto", data.data.images[0].url);
           setPhoto(data.data.images[0].url);
           setURL(data.data.external_urls.spotify);
         });
@@ -81,14 +82,14 @@ export default function Home({ navigation }) {
   }, [response]);
 
   const logout = () => {
-    setToken('');
-    setPhoto('');
-    setURL('');
-    AsyncStorage.removeItem('token');
-    AsyncStorage.removeItem('SpotifyName');
-    AsyncStorage.removeItem('SpotifyUrl');
-    AsyncStorage.removeItem('SpotifyID');
-    AsyncStorage.removeItem('SpotifyPhoto');
+    setToken("");
+    setPhoto("");
+    setURL("");
+    AsyncStorage.removeItem("token");
+    AsyncStorage.removeItem("SpotifyName");
+    AsyncStorage.removeItem("SpotifyUrl");
+    AsyncStorage.removeItem("SpotifyID");
+    AsyncStorage.removeItem("SpotifyPhoto");
   };
 
   return (
@@ -109,10 +110,10 @@ export default function Home({ navigation }) {
             <TouchableOpacity
               style={styles.gobutton}
               onPress={() => {
-                navigation.navigate('Results', { prompt });
+                navigation.navigate("Results", { prompt });
               }}
             >
-              <Text style={{ fontWeight: 'bold' }}>Go</Text>
+              <Text style={{ fontWeight: "bold" }}>Go</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.smallparent}>
@@ -124,11 +125,11 @@ export default function Home({ navigation }) {
                     promptAsync();
                   }}
                 >
-                  <Text style={{ fontWeight: 'bold' }}>Connect</Text>
+                  <Text style={{ fontWeight: "bold" }}>Connect</Text>
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity style={styles.spotifybutton} onPress={logout}>
-                  <Text style={{ fontWeight: 'bold' }}>Disconnect</Text>
+                  <Text style={{ fontWeight: "bold" }}>Disconnect</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -152,7 +153,7 @@ export default function Home({ navigation }) {
         transparent
         visible={modalVisible}
         onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
+          Alert.alert("Modal has been closed.");
           setModalVisible(!modalVisible);
         }}
       >
@@ -165,7 +166,7 @@ export default function Home({ navigation }) {
                 promptAsync();
               }}
             >
-              <Text style={{ fontWeight: 'bold' }}>Connect to Spotify</Text>
+              <Text style={{ fontWeight: "bold" }}>Connect to Spotify</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -175,40 +176,40 @@ export default function Home({ navigation }) {
 }
 const styles = StyleSheet.create({
   phone: {
-    height: '100%',
-    width: '100%',
+    height: "100%",
+    width: "100%",
     flex: 1,
     backgroundColor: globals.colors.base.primary,
   },
   parent: {
     flex: 1,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    height: '100%',
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: "100%",
   },
   spoton: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 40,
     color: globals.colors.text.primary,
-    textAlign: 'center',
-    marginBottom: '5%',
+    textAlign: "center",
+    marginBottom: "5%",
   },
   formbg: {
     backgroundColor: globals.colors.base.secondary,
-    borderColor: 'grey',
-    borderStyle: 'solid',
+    borderColor: "grey",
+    borderStyle: "solid",
     width: 300,
     height: 50,
     borderBottomLeftRadius: 10,
     borderTopLeftRadius: 10,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: 10,
     marginBottom: 10,
   },
   textinput: {
-    width: '100%',
+    width: "100%",
     color: globals.colors.text.primary,
   },
   gobutton: {
@@ -217,25 +218,25 @@ const styles = StyleSheet.create({
     width: 40,
     borderBottomRightRadius: 10,
     borderTopRightRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   spotifybutton: {
     backgroundColor: globals.colors.base.accent,
     height: 30,
     borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingLeft: 7,
     paddingRight: 7,
   },
   smallparent: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
   },
   sltext: {
     color: globals.colors.text.primary,
-    textAlign: 'center',
+    textAlign: "center",
   },
   image: {
     height: 30,
@@ -250,17 +251,17 @@ const styles = StyleSheet.create({
   // Modal stuff
   centeredView: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
   },
   modalView: {
     margin: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 20,
     padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -271,7 +272,7 @@ const styles = StyleSheet.create({
   },
   modalText: {
     marginBottom: 15,
-    textAlign: 'center',
+    textAlign: "center",
   },
   spotifybutton: {
     backgroundColor: globals.colors.base.accent,
