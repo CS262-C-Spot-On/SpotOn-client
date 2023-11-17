@@ -1,5 +1,4 @@
-import React, { Component, useState } from "react";
-import globals from "../Globals";
+import React, { Component, useState } from 'react';
 import SafeAreaView from 'react-native-safe-area-view';
 import {
   Text,
@@ -9,12 +8,13 @@ import {
   Pressable,
   Touchable,
   TouchableOpacity,
-} from "react-native";
+} from 'react-native';
+import globals from '../Globals';
 
 export default function SignUp({ navigation }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const handleSignup = async () => {
     // Check if the email is in the right format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -33,7 +33,7 @@ export default function SignUp({ navigation }) {
     const user = {
       users_name: name,
       emailAddress: email,
-      password: password,
+      password,
     };
 
     try {
@@ -100,7 +100,7 @@ export default function SignUp({ navigation }) {
                 style={styles.textinput}
                 placeholder="Password"
                 placeholderTextColor={globals.colors.text.secondary}
-                secureTextEntry={true}
+                secureTextEntry
                 value={password}
                 onChangeText={(text) => setPassword(text)}
               />
@@ -131,7 +131,7 @@ export default function SignUp({ navigation }) {
               <View>
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate("LogIn");
+                    navigation.navigate('LogIn');
                   }}
                 >
                   <Text style={styles.lgtext2}>Login</Text>
@@ -152,94 +152,94 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
   },
   centerbox: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
   appname: {
-    width: "100%",
-    height: "15%",
-    justifyContent: "center",
-    alignItems: "center",
+    width: '100%',
+    height: '15%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   instagram: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 40,
     color: globals.colors.base.accent,
   },
   textinput: {
-    color: globals.colors.text.primary
+    color: globals.colors.text.primary,
   },
   sumessage: {
-    height: "5%",
-    alignItems: "center",
+    height: '5%',
+    alignItems: 'center',
   },
   message: {
-    textAlign: "center",
-    fontWeight: "bold",
+    textAlign: 'center',
+    fontWeight: 'bold',
     color: globals.colors.text.primary,
   },
   formfield: {
     backgroundColor: globals.colors.base.primary,
-    width: "100%",
-    height: "40%",
-    justifyContent: "center",
-    alignItems: "center",
+    width: '100%',
+    height: '40%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   formbg: {
     backgroundColor: globals.colors.base.secondary,
-    borderColor: "grey",
-    borderStyle: "solid",
-    width: "75%",
+    borderColor: 'grey',
+    borderStyle: 'solid',
+    width: '75%',
     height: 50,
     borderRadius: 10,
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingHorizontal: 10,
     marginBottom: 10,
   },
   sufield: {
-    width: "100%",
-    height: "10%",
-    justifyContent: "center",
-    alignItems: "center",
+    width: '100%',
+    height: '10%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   subutton: {
     backgroundColor: globals.colors.base.accent,
-    width: "75%",
+    width: '75%',
     height: 50,
     borderRadius: 10,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   signup: {
-    textAlign: "center",
+    textAlign: 'center',
     color: globals.colors.base.primary,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   tcmessage: {
-    height: "10%",
-    alignItems: "center",
+    height: '10%',
+    alignItems: 'center',
   },
 
   tc: {
     color: globals.colors.text.secondary,
-    textAlign: "center",
+    textAlign: 'center',
   },
   logindiv: {
-    backgroundColor: "white",
-    height: "10%",
-    position: "absolute",
+    backgroundColor: 'white',
+    height: '10%',
+    position: 'absolute',
     bottom: 0,
-    width: "100%",
+    width: '100%',
   },
   flexbox: {
     flex: 1,
     backgroundColor: globals.colors.base.primary,
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 25,
   },
 

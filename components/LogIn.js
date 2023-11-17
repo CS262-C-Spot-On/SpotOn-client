@@ -1,4 +1,4 @@
-import React, { Component, useState } from "react";
+import React, { Component, useState } from 'react';
 import {
   Text,
   View,
@@ -7,12 +7,12 @@ import {
   TextInput,
   Pressable,
   TouchableOpacity,
-  Alert
-} from "react-native";
+  Alert,
+} from 'react-native';
 
 export default function LogIn({ navigation }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
     try {
@@ -22,7 +22,7 @@ export default function LogIn({ navigation }) {
 
       // Check if the email is present in the records
       const userRecord = userData.find(
-        (user) => user.emailaddress === email
+        (user) => user.emailaddress === email,
       );
 
       if (userRecord) {
@@ -78,7 +78,7 @@ export default function LogIn({ navigation }) {
                 style={styles.textinput}
                 placeholder="Password"
                 placeholderTextColor={globals.colors.text.secondary}
-                secureTextEntry={true}
+                secureTextEntry
                 value={password}
                 onChangeText={(text) => setPassword(text)}
               />
@@ -102,71 +102,71 @@ export default function LogIn({ navigation }) {
 
 const styles = StyleSheet.create({
   phone: {
-    height: "100%",
+    height: '100%',
     flex: 1,
     backgroundColor: globals.colors.base.primary,
   },
   container: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
   },
   centerbox: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
   appname: {
-    width: "100%",
-    height: "15%",
-    justifyContent: "center",
-    alignItems: "center",
+    width: '100%',
+    height: '15%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   instagram: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 40,
     color: globals.colors.text.primary,
   },
   sumessage: {
-    height: "5%",
-    alignItems: "center",
+    height: '5%',
+    alignItems: 'center',
   },
   message: {
-    textAlign: "center",
-    fontWeight: "bold",
+    textAlign: 'center',
+    fontWeight: 'bold',
     color: globals.colors.text.secondary,
   },
   formfield: {
-    width: "100%",
-    height: "40%",
-    justifyContent: "center",
-    alignItems: "center",
+    width: '100%',
+    height: '40%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   formbg: {
     backgroundColor: globals.colors.base.secondary,
-    width: "75%",
+    width: '75%',
     height: 50,
     borderRadius: 10,
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingHorizontal: 10,
     marginBottom: 10,
   },
   loginfield: {
-    width: "100%",
-    height: "10%",
-    justifyContent: "center",
-    alignItems: "center",
+    width: '100%',
+    height: '10%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   loginbutton: {
-    marginTop: "25%",
+    marginTop: '25%',
     backgroundColor: globals.colors.base.accent,
-    width: "75%",
+    width: '75%',
     height: 50,
     borderRadius: 10,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   logintext: {
-    textAlign: "center",
+    textAlign: 'center',
     color: globals.colors.text.accent,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   textinput: {
     color: globals.colors.text.primary,

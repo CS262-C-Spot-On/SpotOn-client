@@ -1,15 +1,15 @@
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { setBackgroundColorAsync } from "expo-system-ui";
-import { StatusBar } from "expo-status-bar";
-import SignUpScreen from "./components/SignUp";
-import LogInScreen from "./components/LogIn";
-import HomeScreen from "./components/Home";
-import ResultsScreen from "./components/Results";
-import SettingsScreen from "./components/Settings";
-import globals from "./Globals";
-import { Ionicons } from "@expo/vector-icons";
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { setBackgroundColorAsync } from 'expo-system-ui';
+import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
+import SignUpScreen from './components/SignUp';
+import LogInScreen from './components/LogIn';
+import HomeScreen from './components/Home';
+import ResultsScreen from './components/Results';
+import SettingsScreen from './components/Settings';
+import globals from './Globals';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -21,17 +21,17 @@ function HomeTabs() {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
-          if (route.name === "Home") {
-            iconName = focused ? "ios-home" : "ios-home-outline";
-          } else if (route.name === "Settings") {
-            iconName = focused ? "ios-list" : "ios-list-outline";
+          if (route.name === 'Home') {
+            iconName = focused ? 'ios-home' : 'ios-home-outline';
+          } else if (route.name === 'Settings') {
+            iconName = focused ? 'ios-list' : 'ios-list-outline';
           }
 
           // You can return any component that you like here!
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: globals.colors.text.primary,
-        tabBarInactiveTintColor: "gray",
+        tabBarInactiveTintColor: 'gray',
         tabBarStyle: { backgroundColor: globals.colors.base.secondary },
       })}
     >
