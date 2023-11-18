@@ -1,5 +1,4 @@
-import React, { Component, useState } from 'react';
-import SafeAreaView from 'react-native-safe-area-view';
+import React, { Component, useState } from "react";
 import {
   Text,
   View,
@@ -8,24 +7,26 @@ import {
   Pressable,
   Touchable,
   TouchableOpacity,
-} from 'react-native';
-import globals from '../Globals';
+} from "react-native";
+import SafeAreaView from "react-native-safe-area-view";
+
+import globals from "../Globals";
 
 export default function SignUp({ navigation }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const handleSignup = async () => {
     // Check if the email is in the right format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      alert('Error: Please enter a valid email address');
+      alert("Error: Please enter a valid email address");
       return;
     }
 
     // Check if the password is at least 8 characters long
     if (password.length < 8) {
-      alert('Error: Password must be at least 8 characters long');
+      alert("Error: Password must be at least 8 characters long");
       return;
     }
 
@@ -38,23 +39,23 @@ export default function SignUp({ navigation }) {
 
     try {
       // Send a POST request to your API endpoint
-      const response = await fetch('https://spot-on.azurewebsites.net/users', {
-        method: 'POST',
+      const response = await fetch("https://spot-on.azurewebsites.net/users", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(user),
       });
 
       if (response.ok) {
         // User registration was successful
-        navigation.navigate('LogIn'); // Redirect to the login screen
+        navigation.navigate("LogIn"); // Redirect to the login screen
       } else {
-        alert('Error: Registration failed');
+        alert("Error: Registration failed");
       }
     } catch (error) {
       console.error(error);
-      alert('Error: Registration failed');
+      alert("Error: Registration failed");
     }
   };
   return (
@@ -131,7 +132,7 @@ export default function SignUp({ navigation }) {
               <View>
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate('LogIn');
+                    navigation.navigate("LogIn");
                   }}
                 >
                   <Text style={styles.lgtext2}>Login</Text>
@@ -152,20 +153,20 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   centerbox: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   appname: {
-    width: '100%',
-    height: '15%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "100%",
+    height: "15%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   instagram: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 40,
     color: globals.colors.base.accent,
   },
@@ -173,73 +174,73 @@ const styles = StyleSheet.create({
     color: globals.colors.text.primary,
   },
   sumessage: {
-    height: '5%',
-    alignItems: 'center',
+    height: "5%",
+    alignItems: "center",
   },
   message: {
-    textAlign: 'center',
-    fontWeight: 'bold',
+    textAlign: "center",
+    fontWeight: "bold",
     color: globals.colors.text.primary,
   },
   formfield: {
     backgroundColor: globals.colors.base.primary,
-    width: '100%',
-    height: '40%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "100%",
+    height: "40%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   formbg: {
     backgroundColor: globals.colors.base.secondary,
-    borderColor: 'grey',
-    borderStyle: 'solid',
-    width: '75%',
+    borderColor: "grey",
+    borderStyle: "solid",
+    width: "75%",
     height: 50,
     borderRadius: 10,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: 10,
     marginBottom: 10,
   },
   sufield: {
-    width: '100%',
-    height: '10%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "100%",
+    height: "10%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   subutton: {
     backgroundColor: globals.colors.base.accent,
-    width: '75%',
+    width: "75%",
     height: 50,
     borderRadius: 10,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   signup: {
-    textAlign: 'center',
+    textAlign: "center",
     color: globals.colors.base.primary,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   tcmessage: {
-    height: '10%',
-    alignItems: 'center',
+    height: "10%",
+    alignItems: "center",
   },
 
   tc: {
     color: globals.colors.text.secondary,
-    textAlign: 'center',
+    textAlign: "center",
   },
   logindiv: {
-    backgroundColor: 'white',
-    height: '10%',
-    position: 'absolute',
+    backgroundColor: "white",
+    height: "10%",
+    position: "absolute",
     bottom: 0,
-    width: '100%',
+    width: "100%",
   },
   flexbox: {
     flex: 1,
     backgroundColor: globals.colors.base.primary,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     padding: 25,
   },
 

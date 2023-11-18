@@ -1,3 +1,9 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { ResponseType, useAuthRequest } from "expo-auth-session";
+import * as Linking from "expo-linking";
+import * as WebBrowser from "expo-web-browser";
+import React, { useState } from "react";
 import {
   Text,
   View,
@@ -7,29 +13,26 @@ import {
   TouchableOpacity,
   Modal,
 } from "react-native";
-import * as Linking from "expo-linking";
 
+import * as Linking from "expo-linking";
+import SafeAreaView from "react-native-safe-area-view";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as WebBrowser from "expo-web-browser";
+import { ResponseType, useAuthRequest } from "expo-auth-session";
+import React, { useState } from "react";
+import axios from "axios";
 import SafeAreaView from "react-native-safe-area-view";
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-import * as WebBrowser from "expo-web-browser";
-
-import { ResponseType, useAuthRequest } from "expo-auth-session";
-
-import React, { useState } from "react";
-
-import axios from "axios";
-
+ origin/feature/eslint
 import globals from "../Globals";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function Home({ navigation }) {
-  const [prompt, setPrompt] = useState('');
-  const [token, setToken] = useState('');
-  const [photo, setPhoto] = useState('');
-  const [url, setURL] = useState('');
+  const [prompt, setPrompt] = useState("");
+  const [token, setToken] = useState("");
+  const [photo, setPhoto] = useState("");
+  const [url, setURL] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
   AsyncStorage.getItem("token").then((t) => {
@@ -88,9 +91,15 @@ export default function Home({ navigation }) {
   }, [response]);
 
   const logout = () => {
+<<<<<<< HEAD
     setToken('');
     setPhoto('');
     setURL('');
+=======
+    setToken("");
+    setPhoto("");
+    setURL("");
+>>>>>>> origin/feature/eslint
     AsyncStorage.removeItem("token");
     AsyncStorage.removeItem("SpotifyName");
     AsyncStorage.removeItem("SpotifyUrl");
