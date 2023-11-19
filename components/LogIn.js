@@ -1,14 +1,14 @@
-import React, { Component, useState } from "react";
+import React, { useState } from "react";
 import {
   Text,
   View,
   StyleSheet,
   SafeAreaView,
   TextInput,
-  Pressable,
   TouchableOpacity,
-  Alert,
 } from "react-native";
+
+import globals from "../Globals";
 
 export default function LogIn({ navigation }) {
   const [email, setEmail] = useState("");

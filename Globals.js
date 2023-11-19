@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+
 // Global variables for use throughout project
 export default globals = {
   // Default theme

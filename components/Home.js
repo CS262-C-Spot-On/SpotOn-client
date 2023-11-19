@@ -11,19 +11,11 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Alert,
   Modal,
 } from "react-native";
-
-import * as Linking from "expo-linking";
-import SafeAreaView from "react-native-safe-area-view";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as WebBrowser from "expo-web-browser";
-import { ResponseType, useAuthRequest } from "expo-auth-session";
-import React, { useState } from "react";
-import axios from "axios";
 import SafeAreaView from "react-native-safe-area-view";
 
- origin/feature/eslint
 import globals from "../Globals";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -53,7 +45,7 @@ export default function Home({ navigation }) {
     tokenEndpoint: "https://accounts.spotify.com/api/token",
   };
 
-  const [request, response, promptAsync] = useAuthRequest(
+  const [, response, promptAsync] = useAuthRequest(
     {
       responseType: ResponseType.Token,
       clientId: "8f0bb8f5fa3a43ceb0c4a669d403f1f1",
@@ -91,15 +83,9 @@ export default function Home({ navigation }) {
   }, [response]);
 
   const logout = () => {
-<<<<<<< HEAD
-    setToken('');
-    setPhoto('');
-    setURL('');
-=======
     setToken("");
     setPhoto("");
     setURL("");
->>>>>>> origin/feature/eslint
     AsyncStorage.removeItem("token");
     AsyncStorage.removeItem("SpotifyName");
     AsyncStorage.removeItem("SpotifyUrl");
@@ -288,11 +274,5 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: "center",
-  },
-  spotifybutton: {
-    backgroundColor: globals.colors.base.accent,
-    borderRadius: 10,
-    padding: 10,
-    elevation: 2,
   },
 });

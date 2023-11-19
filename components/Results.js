@@ -78,12 +78,13 @@ export default function Results({ route, navigation }) {
     predict(
       songPayload,
       (result) => {
-        const matches = result.match(/\".*?\".*?\(.*?\)/g);
+        let songs = "";
+        const matches = result.match(/".*?".*?\(.*?\)/g);
         if (!matches) {
-          const matches = result.match(/\".*?\" by .*?\n/g);
+          const matches = result.match(/".*?" by .*?\n/g);
           if (!matches) {
             const matches = result.match(/.*?\s*\(.*?\)\n/g);
-            var songs = matches
+            songs = matches
               .map((match) => {
                 const [, name, author] =
                   /(.*?)\s*\((.*?)\)\n/g.exec(match) || "";
@@ -91,19 +92,18 @@ export default function Results({ route, navigation }) {
               })
               .filter((song) => song.name && song.name !== "SONG NAME");
           } else {
-            var songs = matches
+            songs = matches
               .map((match) => {
                 const [, name, author] =
-                  /\"(.*?)\" by (.*?)\n/g.exec(match) || "";
+                  /"(.*?)" by (.*?)\n/g.exec(match) || "";
                 return { name, author };
               })
               .filter((song) => song.name && song.name !== "SONG NAME");
           }
         } else {
-          var songs = matches
+          songs = matches
             .map((match) => {
-              const [, name, author] =
-                /\"(.*?)\".*?\((.*?)\)/g.exec(match) || "";
+              const [, name, author] = /"(.*?)".*?\((.*?)\)/g.exec(match) || "";
               return { name, author };
             })
             .filter((song) => song.name && song.name !== "SONG NAME");
@@ -161,7 +161,7 @@ export default function Results({ route, navigation }) {
                     setTracks((old) => {
                       let f = false;
                       old.forEach((s) => {
-                        if (!f && s.id == slice.id) {
+                        if (!f && s.id === slice.id) {
                           f = true;
                         }
                       });
@@ -177,7 +177,7 @@ export default function Results({ route, navigation }) {
                   setTracks((old) => {
                     let f = false;
                     old.forEach((s) => {
-                      if (!f && s.id == data.data.tracks.items[0].id) {
+                      if (!f && s.id === data.data.tracks.items[0].id) {
                         f = true;
                       }
                     });
@@ -196,14 +196,14 @@ export default function Results({ route, navigation }) {
         console.log(t);
         const matches = t.match(/[0-9]+/g);
         // console.log(matches);
-        if (!matches || matches.length < 1 || matches[0] == "1") {
+        if (!matches || matches.length < 1 || matches[0] === "1") {
           return;
         }
-        const max = parseInt(matches[0]);
+        const max = parseInt(matches[0], 10);
         let top = 0;
         let count = 1;
         while (count < matches.length) {
-          if (matches[count] == top + 1) {
+          if (matches[count] === top + 1) {
             top++;
           }
           count++;
@@ -323,7 +323,7 @@ export default function Results({ route, navigation }) {
                   setTracks((old) => {
                     let f = false;
                     old.forEach((s) => {
-                      if (!f && s.id == slice.id) {
+                      if (!f && s.id === slice.id) {
                         f = true;
                       }
                     });
@@ -339,7 +339,7 @@ export default function Results({ route, navigation }) {
                 setTracks((old) => {
                   let f = false;
                   old.forEach((s) => {
-                    if (!f && s.id == data.data.tracks.items[0].id) {
+                    if (!f && s.id === data.data.tracks.items[0].id) {
                       f = true;
                     }
                   });
