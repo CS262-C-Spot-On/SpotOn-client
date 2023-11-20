@@ -1,11 +1,9 @@
-import React, { Component, useState } from "react";
+import React, {useState } from "react";
 import {
   Text,
   View,
   StyleSheet,
   TextInput,
-  Pressable,
-  Touchable,
   TouchableOpacity,
 } from "react-native";
 import SafeAreaView from "react-native-safe-area-view";
