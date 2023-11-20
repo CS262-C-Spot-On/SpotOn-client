@@ -1,15 +1,14 @@
-import React, { Component, useState } from "react";
-import globals from "../Globals";
-import SafeAreaView from 'react-native-safe-area-view';
+import React, {useState } from "react";
 import {
   Text,
   View,
   StyleSheet,
   TextInput,
-  Pressable,
-  Touchable,
   TouchableOpacity,
 } from "react-native";
+import SafeAreaView from "react-native-safe-area-view";
+
+import globals from "../Globals";
 
 export default function SignUp({ navigation }) {
   const [email, setEmail] = useState("");
@@ -19,13 +18,13 @@ export default function SignUp({ navigation }) {
     // Check if the email is in the right format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      alert('Error: Please enter a valid email address');
+      alert("Error: Please enter a valid email address");
       return;
     }
 
     // Check if the password is at least 8 characters long
     if (password.length < 8) {
-      alert('Error: Password must be at least 8 characters long');
+      alert("Error: Password must be at least 8 characters long");
       return;
     }
 
@@ -33,28 +32,28 @@ export default function SignUp({ navigation }) {
     const user = {
       users_name: name,
       emailAddress: email,
-      password: password,
+      password,
     };
 
     try {
       // Send a POST request to your API endpoint
-      const response = await fetch('https://spot-on.azurewebsites.net/users', {
-        method: 'POST',
+      const response = await fetch("https://spot-on.azurewebsites.net/users", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(user),
       });
 
       if (response.ok) {
         // User registration was successful
-        navigation.navigate('LogIn'); // Redirect to the login screen
+        navigation.navigate("LogIn"); // Redirect to the login screen
       } else {
-        alert('Error: Registration failed');
+        alert("Error: Registration failed");
       }
     } catch (error) {
       console.error(error);
-      alert('Error: Registration failed');
+      alert("Error: Registration failed");
     }
   };
   return (
@@ -100,7 +99,7 @@ export default function SignUp({ navigation }) {
                 style={styles.textinput}
                 placeholder="Password"
                 placeholderTextColor={globals.colors.text.secondary}
-                secureTextEntry={true}
+                secureTextEntry
                 value={password}
                 onChangeText={(text) => setPassword(text)}
               />
@@ -170,7 +169,7 @@ const styles = StyleSheet.create({
     color: globals.colors.base.accent,
   },
   textinput: {
-    color: globals.colors.text.primary
+    color: globals.colors.text.primary,
   },
   sumessage: {
     height: "5%",

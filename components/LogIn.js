@@ -1,14 +1,14 @@
-import React, { Component, useState } from "react";
+import React, { useState } from "react";
 import {
   Text,
   View,
   StyleSheet,
   SafeAreaView,
   TextInput,
-  Pressable,
   TouchableOpacity,
-  Alert
 } from "react-native";
+
+import globals from "../Globals";
 
 export default function LogIn({ navigation }) {
   const [email, setEmail] = useState("");
@@ -17,30 +17,28 @@ export default function LogIn({ navigation }) {
   const handleLogin = async () => {
     try {
       // Fetch user data from the server
-      const response = await fetch('https://spot-on.azurewebsites.net/users');
+      const response = await fetch("https://spot-on.azurewebsites.net/users");
       const userData = await response.json();
 
       // Check if the email is present in the records
-      const userRecord = userData.find(
-        (user) => user.emailaddress === email
-      );
+      const userRecord = userData.find((user) => user.emailaddress === email);
 
       if (userRecord) {
         // Check if the password matches
         if (userRecord.password === password) {
           // Authentication successful
-          navigation.navigate('HomeTabs', { screen: 'Home' });
+          navigation.navigate("HomeTabs", { screen: "Home" });
         } else {
           // Password doesn't match
-          alert('Error: Incorrect password');
+          alert("Error: Incorrect password");
         }
       } else {
         // Email not found in records
-        alert('Error: Email not found');
+        alert("Error: Email not found");
       }
     } catch (error) {
       console.error(error);
-      alert('Error: Login failed');
+      alert("Error: Login failed");
     }
   };
 
@@ -78,7 +76,7 @@ export default function LogIn({ navigation }) {
                 style={styles.textinput}
                 placeholder="Password"
                 placeholderTextColor={globals.colors.text.secondary}
-                secureTextEntry={true}
+                secureTextEntry
                 value={password}
                 onChangeText={(text) => setPassword(text)}
               />

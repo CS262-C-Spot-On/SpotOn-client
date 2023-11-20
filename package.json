@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@expo/vector-icons": "^13.0.0",
@@ -16,6 +17,7 @@
     "@react-navigation/stack": "^6.3.18",
     "alert": "^6.0.1",
     "axios": "^1.5.1",
+    "eslint-config-universe": "^12.0.0",
     "expo": "^49.0.16",
     "expo-auth-session": "~5.0.2",
     "expo-status-bar": "~1.6.0",
@@ -34,7 +36,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@expo/webpack-config": "^19.0.0"
+    "@expo/webpack-config": "^19.0.0",
+    "eslint": "^8.53.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0"
   },
   "private": true
 }

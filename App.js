@@ -1,15 +1,16 @@
+import { Ionicons } from "@expo/vector-icons";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { setBackgroundColorAsync } from "expo-system-ui";
 import { StatusBar } from "expo-status-bar";
-import SignUpScreen from "./components/SignUp";
-import LogInScreen from "./components/LogIn";
+import { setBackgroundColorAsync } from "expo-system-ui";
+
+import globals from "./Globals";
 import HomeScreen from "./components/Home";
+import LogInScreen from "./components/LogIn";
 import ResultsScreen from "./components/Results";
 import SettingsScreen from "./components/Settings";
-import globals from "./Globals";
-import { Ionicons } from "@expo/vector-icons";
+import SignUpScreen from "./components/SignUp";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();

@@ -1,3 +1,9 @@
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import * as Linking from "expo-linking";
+import LottieView from "lottie-react-native";
+import React, { useEffect, useState, useRef } from "react";
 import {
   ScrollView,
   Image,
@@ -6,18 +12,13 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
-  Alert
+  Alert,
 } from "react-native";
-import LottieView from "lottie-react-native";
+import * as Progress from "react-native-progress";
 import SafeAreaView from "react-native-safe-area-view";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useState, useRef } from "react";
-import * as Linking from "expo-linking";
-import axios from "axios";
 import uuid from "react-uuid";
+
 import globals from "../Globals";
-import * as Progress from 'react-native-progress';
 
 export default function Results({ route, navigation }) {
   const animationRef = useRef(null);
@@ -27,10 +28,7 @@ export default function Results({ route, navigation }) {
   const [adding, setAdding] = useState(false);
   const [info, setInfo] = useState({
     name: "SpotOn Generated Playlist",
-    description:
-      'This playlist was generated with SpotOn using the prompt "' +
-      route.params.prompt +
-      '". Feel free to change the name and description to your liking!',
+    description: `This playlist was generated with SpotOn using the prompt "${route.params.prompt}". Feel free to change the name and description to your liking!`,
   });
 
   // Inital Llama2-chat connection
@@ -58,9 +56,10 @@ export default function Results({ route, navigation }) {
     // Data sent to LLM server
     const songPayload = {
       data: [
-        'Write an ordered list of songs in the format ["SONG NAME" (AUTHOR)] according to the prompt "' + // Main prompt
-          route.params.prompt +
-          '". Do not write descriptions or give additional commentary. Do not repeat songs.' +
+        `Write an ordered list of songs in the format ["SONG NAME" (AUTHOR)] according to the prompt "${
+          // Main prompt
+          route.params.prompt
+        }". Do not write descriptions or give additional commentary. Do not repeat songs.` +
           " Use the full length name of the song, and ensure that the author is correct." +
           " Only supply the main author, do not include additional. Do not make up or imagine songs.",
         null,
@@ -76,130 +75,150 @@ export default function Results({ route, navigation }) {
     };
 
     // Sent data to server and parse results
-    predict(songPayload, (result) => {
-      const matches = result.match(/\".*?\".*?\(.*?\)/g);
-      if (!matches) {
-        const matches = result.match(/\".*?\" by .*?\n/g);
+    predict(
+      songPayload,
+      (result) => {
+        let songs = "";
+        const matches = result.match(/".*?".*?\(.*?\)/g);
         if (!matches) {
-          const matches = result.match(/.*?\s*\(.*?\)\n/g);
-          var songs = matches
-            .map((match) => {
-              const [, name, author] = /(.*?)\s*\((.*?)\)\n/g.exec(match) || "";
-              return { name, author };
-            })
-            .filter((song) => song.name && song.name !== "SONG NAME");
+          const matches = result.match(/".*?" by .*?\n/g);
+          if (!matches) {
+            const matches = result.match(/.*?\s*\(.*?\)\n/g);
+            songs = matches
+              .map((match) => {
+                const [, name, author] =
+                  /(.*?)\s*\((.*?)\)\n/g.exec(match) || "";
+                return { name, author };
+              })
+              .filter((song) => song.name && song.name !== "SONG NAME");
+          } else {
+            songs = matches
+              .map((match) => {
+                const [, name, author] =
+                  /"(.*?)" by (.*?)\n/g.exec(match) || "";
+                return { name, author };
+              })
+              .filter((song) => song.name && song.name !== "SONG NAME");
+          }
         } else {
-          var songs = matches
+          songs = matches
             .map((match) => {
-              const [, name, author] =
-                /\"(.*?)\" by (.*?)\n/g.exec(match) || "";
+              const [, name, author] = /"(.*?)".*?\((.*?)\)/g.exec(match) || "";
               return { name, author };
             })
             .filter((song) => song.name && song.name !== "SONG NAME");
         }
-      } else {
-        var songs = matches
-          .map((match) => {
-            const [, name, author] = /\"(.*?)\".*?\((.*?)\)/g.exec(match) || "";
-            return { name, author };
-          })
-          .filter((song) => song.name && song.name !== "SONG NAME");
-      }
 
-      let error = false;
+        let error = false;
 
-      // Lookup each song on spotify
-      songs.forEach((song) => {
-        console.log(song.name);
-        AsyncStorage.getItem("token").then((token) => {
-          axios
-            .get("https://api.spotify.com/v1/search", {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-              params: {
-                q: song.name,
-                type: "track",
-              },
-            }).catch(() => {
-              if (error) {return;}
-              error = true;
-              Alert.alert('Whoopsies!', 'Sorry, it looks like there\'s something wrong with Spotify. Try disconnecting and reconnecting', [
-                {text: 'Go Home', onPress: () => navigation.navigate('Home')},
-              ]);
-            })
-            .then((data) => {
-              if (error) {return;}
-              let found = false;
-              data.data.tracks.items.forEach((slice) => {
-                if (
-                  !found &&
-                  song.author
-                    .toLowerCase()
-                    .includes(
-                      slice.artists[0].name
-                        .toLowerCase()
-                        .replaceAll(/the/g, "")
-                        .split(" ")[0]
-                    )
-                ) {
+        // Lookup each song on spotify
+        songs.forEach((song) => {
+          console.log(song.name);
+          AsyncStorage.getItem("token").then((token) => {
+            axios
+              .get("https://api.spotify.com/v1/search", {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+                params: {
+                  q: song.name,
+                  type: "track",
+                },
+              })
+              .catch(() => {
+                if (error) {
+                  return;
+                }
+                error = true;
+                Alert.alert(
+                  "Whoopsies!",
+                  "Sorry, it looks like there's something wrong with Spotify. Try disconnecting and reconnecting",
+                  [
+                    {
+                      text: "Go Home",
+                      onPress: () => navigation.navigate("Home"),
+                    },
+                  ],
+                );
+              })
+              .then((data) => {
+                if (error) {
+                  return;
+                }
+                let found = false;
+                data.data.tracks.items.forEach((slice) => {
+                  if (
+                    !found &&
+                    song.author
+                      .toLowerCase()
+                      .includes(
+                        slice.artists[0].name
+                          .toLowerCase()
+                          .replaceAll(/the/g, "")
+                          .split(" ")[0],
+                      )
+                  ) {
+                    setTracks((old) => {
+                      let f = false;
+                      old.forEach((s) => {
+                        if (!f && s.id === slice.id) {
+                          f = true;
+                        }
+                      });
+                      if (f) {
+                        return old;
+                      }
+                      return [...old, slice];
+                    });
+                    found = true;
+                  }
+                });
+                if (!found) {
                   setTracks((old) => {
                     let f = false;
                     old.forEach((s) => {
-                      if (!f && s.id == slice.id) {
+                      if (!f && s.id === data.data.tracks.items[0].id) {
                         f = true;
                       }
                     });
                     if (f) {
                       return old;
                     }
-                    return [...old, slice];
+                    return [...old, data.data.tracks.items[0]];
                   });
-                  found = true;
                 }
               });
-              if (!found) {
-                setTracks((old) => {
-                  let f = false;
-                  old.forEach((s) => {
-                    if (!f && s.id == data.data.tracks.items[0].id) {
-                      f = true;
-                    }
-                  });
-                  if (f) {
-                    return old;
-                  }
-                  return [...old, data.data.tracks.items[0]];
-                });
-              }
-            });
+          });
         });
-      });
-    }, "", (t) => {
-      console.log(t);
-      const matches = t.match(/[0-9]+/g);
-      // console.log(matches);
-      if (!matches || matches.length < 1 || matches[0] == "1") {
-        return;
-      }
-      var max = parseInt(matches[0]);
-      var top = 0;
-      var count = 1;
-      while (count < matches.length) {
-        if (matches[count] == top + 1) {
-          top++;
+      },
+      "",
+      (t) => {
+        console.log(t);
+        const matches = t.match(/[0-9]+/g);
+        // console.log(matches);
+        if (!matches || matches.length < 1 || matches[0] === "1") {
+          return;
         }
-        count++;
-      }
-      setLoaded([top, max]);
-    });
+        const max = parseInt(matches[0], 10);
+        let top = 0;
+        let count = 1;
+        while (count < matches.length) {
+          if (matches[count] === top + 1) {
+            top++;
+          }
+          count++;
+        }
+        setLoaded([top, max]);
+      },
+    );
 
     // Data sent to LLM server
     const infoPayload = {
       data: [
-        'Write a creatively accurate name and description for a playlist that was made according to the prompt "' + // Main prompt
-          route.params.prompt +
-          '". Please response in a JSON format, i.e. {"name": "[NAME]", "description": "[DESCRIPTION]"}.' +
+        `Write a creatively accurate name and description for a playlist that was made according to the prompt "${
+          // Main prompt
+          route.params.prompt
+        }". Please response in a JSON format, i.e. {"name": "[NAME]", "description": "[DESCRIPTION]"}.` +
           " Do not give additional commentary besides the requested information. Limit the name to less than 7 words, and the" +
           ' description to less than 50. However, also ensure the description does not cut off, and is complete. Avoid using cheesy terms like "Jams" or "Vibes".',
         null,
@@ -215,7 +234,7 @@ export default function Results({ route, navigation }) {
     };
 
     predict(infoPayload, (result) => {
-      let out = JSON.parse("{" + result.split("{")[1].split("}")[0] + "}");
+      const out = JSON.parse(`{${result.split("{")[1].split("}")[0]}}`);
       if (out.name && out.description) {
         setInfo(out);
       }
@@ -226,14 +245,21 @@ export default function Results({ route, navigation }) {
     setAdding(true);
     const infoPayload = {
       data: [
-        'Suggest a single new song that fits well in concept and genre to the following playlist [' + // Main prompt
-          tracks.map((track) => '{"song": "'+track.name+'", "artist": "'+track.artists[0].name+'"}').join(', ') +
-          '] Please response in a JSON format, i.e. {"song": "[SONG]", "artist": "[ARTIST]"}.' +
-          " Do not provide additional commentary, only the requested information. Be concise and accurate." +
-          ' Ensure that the artist is truly the author of the song. Do not suggest a song already in the playlist.',
+        `Suggest a single new song that fits well in concept and genre to the following playlist [${
+          // Main prompt
+          tracks
+            .map(
+              (track) =>
+                `{"song": "${track.name}", "artist": "${track.artists[0].name}"}`,
+            )
+            .join(", ")
+        }] Please response in a JSON format, i.e. {"song": "[SONG]", "artist": "[ARTIST]"}.` +
+          " Do not provide additional commentary or descriptions, only the requested information. Be concise and accurate." +
+          " Ensure that the artist is truly the author of the song. Do not suggest a song already in the playlist." +
+          " MOST IMPORTANTLY, ENSURE THE JSON IS COMPLETE, with every bracket and quotation closed.",
         null,
         "", // System prompt
-        256, // Max tokens for response
+        128, // Max tokens for response
         0.9, // Temperature
         0.05, // Top-P
         1, // Top-K
@@ -246,7 +272,9 @@ export default function Results({ route, navigation }) {
     predict(infoPayload, (result) => {
       setAdding(false);
       let error = false;
-      let out = JSON.parse("{" + result.split("{")[1].split("}")[0] + "}");
+      console.log(result);
+      const out = JSON.parse(`{${result.split("{")[1].split("}")[0]}}`);
+      console.log(out);
       if (out.song && out.artist) {
         AsyncStorage.getItem("token").then((token) => {
           axios
@@ -258,15 +286,27 @@ export default function Results({ route, navigation }) {
                 q: out.song,
                 type: "track",
               },
-            }).catch(() => {
-              if (error) {return;}
+            })
+            .catch(() => {
+              if (error) {
+                return;
+              }
               error = true;
-              Alert.alert('Whoopsies!', 'Sorry, it looks like there\'s something wrong with Spotify. Try disconnecting and reconnecting', [
-                {text: 'Go Home', onPress: () => navigation.navigate('Home')},
-              ]);
+              Alert.alert(
+                "Whoopsies!",
+                "Sorry, it looks like there's something wrong with Spotify. Try disconnecting and reconnecting",
+                [
+                  {
+                    text: "Go Home",
+                    onPress: () => navigation.navigate("Home"),
+                  },
+                ],
+              );
             })
             .then((data) => {
-              if (error) {return;}
+              if (error) {
+                return;
+              }
               let found = false;
               data.data.tracks.items.forEach((slice) => {
                 if (
@@ -277,13 +317,13 @@ export default function Results({ route, navigation }) {
                       slice.artists[0].name
                         .toLowerCase()
                         .replaceAll(/the/g, "")
-                        .split(" ")[0]
+                        .split(" ")[0],
                     )
                 ) {
                   setTracks((old) => {
                     let f = false;
                     old.forEach((s) => {
-                      if (!f && s.id == slice.id) {
+                      if (!f && s.id === slice.id) {
                         f = true;
                       }
                     });
@@ -299,7 +339,7 @@ export default function Results({ route, navigation }) {
                 setTracks((old) => {
                   let f = false;
                   old.forEach((s) => {
-                    if (!f && s.id == data.data.tracks.items[0].id) {
+                    if (!f && s.id === data.data.tracks.items[0].id) {
                       f = true;
                     }
                   });
@@ -325,7 +365,7 @@ export default function Results({ route, navigation }) {
       AsyncStorage.getItem("SpotifyID").then((id) => {
         axios
           .post(
-            "https://api.spotify.com/v1/users/" + id + "/playlists",
+            `https://api.spotify.com/v1/users/${id}/playlists`,
             {
               name: info.name,
               description: info.description,
@@ -335,14 +375,12 @@ export default function Results({ route, navigation }) {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
-            }
+            },
           )
           .then((data) => {
             axios
               .post(
-                "https://api.spotify.com/v1/playlists/" +
-                  data.data.id +
-                  "/tracks",
+                `https://api.spotify.com/v1/playlists/${data.data.id}/tracks`,
                 {
                   uris: tracks.map((track) => track.uri),
                   position: 0,
@@ -351,13 +389,13 @@ export default function Results({ route, navigation }) {
                   headers: {
                     Authorization: `Bearer ${token}`,
                   },
-                }
+                },
               )
               .then((trackdata) => {
                 setTimeout(() => {
                   setSending(false);
                   Linking.openURL(data.data.external_urls.spotify);
-                }, 1500)
+                }, 1500);
               });
           });
       });
@@ -376,11 +414,10 @@ export default function Results({ route, navigation }) {
               onPress={makePlaylist}
             >
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text style={{ fontWeight: "bold", marginRight: 3 }}>Send to Spotify</Text>
-                { sending
-                  ? <ActivityIndicator></ActivityIndicator>
-                  : null
-                }
+                <Text style={{ fontWeight: "bold", marginRight: 3 }}>
+                  Send to Spotify
+                </Text>
+                {sending ? <ActivityIndicator /> : null}
               </View>
             </TouchableOpacity>
           </View>
@@ -408,31 +445,37 @@ export default function Results({ route, navigation }) {
                 </Text>
               </View>
               <TouchableOpacity
-                //style={styles.spotifybutton}
+                // style={styles.spotifybutton}
                 onPress={() => {
                   setTracks((old) => {
-                    var ind = old.map(i => i.id).indexOf(track.id);
+                    const ind = old.map((i) => i.id).indexOf(track.id);
                     if (~ind) {
-                      old.splice(ind, 1)
+                      old.splice(ind, 1);
                       return old.splice(0); // Updates view
                     }
                     return old; // No update view
                   });
                 }}
               >
-                <Ionicons name="trash-outline" size={25} color={globals.colors.text.secondary} />
+                <Ionicons
+                  name="trash-outline"
+                  size={25}
+                  color={globals.colors.text.secondary}
+                />
               </TouchableOpacity>
             </View>
           ))
         ) : (
           <View style={styles.border}>
-            <View style={{
-                  width: 300,
-                  height: 300,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  flex: 1,
-                }}>
+            <View
+              style={{
+                width: 300,
+                height: 300,
+                justifyContent: "center",
+                alignItems: "center",
+                flex: 1,
+              }}
+            >
               <LottieView
                 ref={animationRef}
                 source={require("../assets/lottie.json")}
@@ -444,33 +487,37 @@ export default function Results({ route, navigation }) {
               <Text style={styles.loadertext}>
                 Hold tight! Making your new playlist...
               </Text>
-              { loaded
-                ? <View>
-                    <Progress.Bar color={ globals.colors.base.accent } progress={loaded[0] / loaded[1]} width={200} />
-                    <Text style={styles.loadertext}>
-                      {loaded[0]}/{loaded[1]}
-                    </Text>
-                  </View>
-                : <ActivityIndicator></ActivityIndicator>
-              }
+              {loaded ? (
+                <View>
+                  <Progress.Bar
+                    color={globals.colors.base.accent}
+                    progress={loaded[0] / loaded[1]}
+                    width={200}
+                  />
+                  <Text style={styles.loadertext}>
+                    {loaded[0]}/{loaded[1]}
+                  </Text>
+                </View>
+              ) : (
+                <ActivityIndicator />
+              )}
             </View>
           </View>
         )}
       </ScrollView>
-      { tracks.length > 0 ?
+      {tracks.length > 0 ? (
         <TouchableOpacity
           style={styles.addbutton}
-          onPress={addSong}
+          onPress={adding ? null : addSong}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={{ fontWeight: "bold", marginRight: 3 }}>Add a Song</Text>
-            { adding
-              ? <ActivityIndicator></ActivityIndicator>
-              : null
-            }
+            <Text style={{ fontWeight: "bold", marginRight: 3, fontSize: 15 }}>
+              Add a song
+            </Text>
+            {adding ? <ActivityIndicator /> : null}
           </View>
         </TouchableOpacity>
-      : null }
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -504,7 +551,7 @@ const styles = StyleSheet.create({
   loadertext: {
     color: globals.colors.text.primary,
     alignSelf: "center",
-    margin: 5
+    margin: 5,
   },
   text2: {
     color: globals.colors.text.secondary,
@@ -565,14 +612,14 @@ const styles = StyleSheet.create({
   },
   addbutton: {
     backgroundColor: globals.colors.base.accent,
-    height: 30,
+    height: 40,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
     paddingLeft: 7,
     paddingRight: 7,
-    position: 'absolute',                                          
-    bottom: 10,                                                    
-    right: 10, 
+    position: "absolute",
+    bottom: 10,
+    right: 10,
   },
 });

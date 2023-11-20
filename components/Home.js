@@ -1,3 +1,9 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { ResponseType, useAuthRequest } from "expo-auth-session";
+import * as Linking from "expo-linking";
+import * as WebBrowser from "expo-web-browser";
+import React, { useState } from "react";
 import {
   Text,
   View,
@@ -5,16 +11,12 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Alert,
   Modal,
 } from "react-native";
-import * as Linking from "expo-linking";
 import SafeAreaView from "react-native-safe-area-view";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as WebBrowser from "expo-web-browser";
-import { ResponseType, useAuthRequest } from "expo-auth-session";
-import React, { useState } from "react";
+
 import globals from "../Globals";
-import axios from "axios";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -43,7 +45,7 @@ export default function Home({ navigation }) {
     tokenEndpoint: "https://accounts.spotify.com/api/token",
   };
 
-  const [request, response, promptAsync] = useAuthRequest(
+  const [, response, promptAsync] = useAuthRequest(
     {
       responseType: ResponseType.Token,
       clientId: "8f0bb8f5fa3a43ceb0c4a669d403f1f1",
@@ -55,7 +57,7 @@ export default function Home({ navigation }) {
       usePKCE: false,
       redirectUri: Linking.createURL(),
     },
-    discovery
+    discovery,
   );
 
   React.useEffect(() => {
@@ -109,7 +111,7 @@ export default function Home({ navigation }) {
             <TouchableOpacity
               style={styles.gobutton}
               onPress={() => {
-                navigation.navigate("Results", { prompt: prompt });
+                navigation.navigate("Results", { prompt });
               }}
             >
               <Text style={{ fontWeight: "bold" }}>Go</Text>
@@ -149,7 +151,7 @@ export default function Home({ navigation }) {
       {/* Modal for Spotify Connection */}
       <Modal
         animationType="slide"
-        transparent={true}
+        transparent
         visible={modalVisible}
         onRequestClose={() => {
           Alert.alert("Modal has been closed.");
@@ -272,11 +274,5 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: "center",
-  },
-  spotifybutton: {
-    backgroundColor: globals.colors.base.accent,
-    borderRadius: 10,
-    padding: 10,
-    elevation: 2,
   },
 });
