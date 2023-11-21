@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable eqeqeq */
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -161,7 +163,7 @@ export default function Results({ route, navigation }) {
                     setTracks((old) => {
                       let f = false;
                       old.forEach((s) => {
-                        if (!f && s.id === slice.id) {
+                        if (!f && s.id == slice.id) {
                           f = true;
                         }
                       });
@@ -177,7 +179,7 @@ export default function Results({ route, navigation }) {
                   setTracks((old) => {
                     let f = false;
                     old.forEach((s) => {
-                      if (!f && s.id === data.data.tracks.items[0].id) {
+                      if (!f && s.id == data.data.tracks.items[0].id) {
                         f = true;
                       }
                     });
@@ -196,14 +198,14 @@ export default function Results({ route, navigation }) {
         console.log(t);
         const matches = t.match(/[0-9]+/g);
         // console.log(matches);
-        if (!matches || matches.length < 1 || matches[0] === "1") {
+        if (!matches || matches.length < 1 || matches[0] == "1") {
           return;
         }
         const max = parseInt(matches[0], 10);
         let top = 0;
         let count = 1;
         while (count < matches.length) {
-          if (matches[count] === top + 1) {
+          if (matches[count] == top + 1) {
             top++;
           }
           count++;
@@ -323,7 +325,7 @@ export default function Results({ route, navigation }) {
                   setTracks((old) => {
                     let f = false;
                     old.forEach((s) => {
-                      if (!f && s.id === slice.id) {
+                      if (!f && s.id == slice.id) {
                         f = true;
                       }
                     });
@@ -339,7 +341,7 @@ export default function Results({ route, navigation }) {
                 setTracks((old) => {
                   let f = false;
                   old.forEach((s) => {
-                    if (!f && s.id === data.data.tracks.items[0].id) {
+                    if (!f && s.id == data.data.tracks.items[0].id) {
                       f = true;
                     }
                   });
