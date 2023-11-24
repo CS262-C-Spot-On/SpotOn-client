@@ -1,21 +1,27 @@
-import React, {useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Text,
   View,
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import SafeAreaView from "react-native-safe-area-view";
+import LottieView from "lottie-react-native";
 
 import globals from "../Globals";
 
 export default function SignUp({ navigation }) {
+  const animationRef = useRef(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleSignup = async () => {
     // Check if the email is in the right format
+    setIsLoading(true);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       alert("Error: Please enter a valid email address");
@@ -37,6 +43,7 @@ export default function SignUp({ navigation }) {
 
     try {
       // Send a POST request to your API endpoint
+
       const response = await fetch("https://spot-on.azurewebsites.net/users", {
         method: "POST",
         headers: {
@@ -51,11 +58,29 @@ export default function SignUp({ navigation }) {
       } else {
         alert("Error: Registration failed");
       }
+      setIsLoading(false);
     } catch (error) {
       console.error(error);
       alert("Error: Registration failed");
+      setIsLoading(false);
     }
   };
+  if (isLoading) {
+    // Show only loader when loading
+    return (
+      <SafeAreaView style={styles.phone}>
+        <View style={styles.c_parent}>
+          {/* <ActivityIndicator></ActivityIndicator> */}
+          <LottieView
+            ref={animationRef}
+            source={require("../assets/lottie.json")}
+            autoPlay
+            loop
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
   return (
     <SafeAreaView style={styles.phone}>
       <View style={styles.container}>
@@ -124,16 +149,16 @@ export default function SignUp({ navigation }) {
           </View>
           <View style={styles.logindiv}>
             <View style={styles.flexbox}>
-              <View>
+              {/* <View>
                 <Text style={styles.lgtext1}>Have an account? </Text>
-              </View>
+              </View> */}
               <View>
                 <TouchableOpacity
                   onPress={() => {
                     navigation.navigate("LogIn");
                   }}
                 >
-                  <Text style={styles.lgtext2}>Login</Text>
+                  <Text style={styles.lgtext2}>Have an account? Login</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -153,9 +178,20 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
+  c_parent: {
+    height: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   centerbox: {
     width: "100%",
     height: "100%",
+  },
+  border: {
+    marginTop: "50%",
+    width: "100%",
+    alignItems: "center",
   },
   appname: {
     width: "100%",

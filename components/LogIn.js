@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Text,
   View,
@@ -9,12 +9,16 @@ import {
 } from "react-native";
 
 import globals from "../Globals";
+import LottieView from "lottie-react-native";
 
 export default function LogIn({ navigation }) {
+  const animationRef = useRef(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
+    setIsLoading(true);
     try {
       // Fetch user data from the server
       const response = await fetch("https://spot-on.azurewebsites.net/users");
@@ -27,6 +31,7 @@ export default function LogIn({ navigation }) {
         // Check if the password matches
         if (userRecord.password === password) {
           // Authentication successful
+          setIsLoading(false);
           navigation.navigate("HomeTabs", { screen: "Home" });
         } else {
           // Password doesn't match
@@ -41,6 +46,22 @@ export default function LogIn({ navigation }) {
       alert("Error: Login failed");
     }
   };
+  if (isLoading) {
+    // Show only loader when loading
+    return (
+      <SafeAreaView style={styles.phone}>
+        <View style={styles.c_parent}>
+          {/* <ActivityIndicator></ActivityIndicator> */}
+          <LottieView
+            ref={animationRef}
+            source={require("../assets/lottie.json")}
+            autoPlay
+            loop
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.phone}>
@@ -103,6 +124,12 @@ const styles = StyleSheet.create({
     height: "100%",
     flex: 1,
     backgroundColor: globals.colors.base.primary,
+  },
+  c_parent: {
+    height: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
   container: {
     flex: 1,

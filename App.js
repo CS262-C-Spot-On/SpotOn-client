@@ -25,7 +25,7 @@ function HomeTabs() {
           if (route.name === "Home") {
             iconName = focused ? "ios-home" : "ios-home-outline";
           } else if (route.name === "Settings") {
-            iconName = focused ? "ios-list" : "ios-list-outline";
+            iconName = focused ? "settings" : "settings-outline";
           }
 
           // You can return any component that you like here!
