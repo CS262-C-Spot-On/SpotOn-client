@@ -108,7 +108,7 @@ export default function LogIn({ navigation }) {
               style={styles.loginbutton}
               onPress={() => {
                 //handleLogin();
-                navigation.navigate("HomeTabs", { screen: "Home" });
+                navigation.navigate("HomeTabs" , { screen: "Home" });
               }}
             >
               <Text style={styles.logintext}>Log In</Text>
