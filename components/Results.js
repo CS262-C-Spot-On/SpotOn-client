@@ -40,7 +40,7 @@ export default function Results({ route, navigation }) {
 
   // Continually probe for finished response
   function predict(payload, callback, lastoutput = "", tempcallback = null) {
-    gradio.post("/--replicas/gm5p8/api/predict/", payload).then((result) => {
+    gradio.post("/--replicas/sbx2w/api/predict/", payload).then((result) => {
       if (result.data.is_generating) {
         if (tempcallback) {
           tempcallback(result.data.data[0]);
