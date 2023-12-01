@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+import LottieView from "lottie-react-native";
 import React, { useState, useRef } from "react";
 import {
   Text,
@@ -8,7 +10,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import SafeAreaView from "react-native-safe-area-view";
-import LottieView from "lottie-react-native";
 
 import globals from "../Globals";
 

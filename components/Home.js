@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { ResponseType, useAuthRequest } from "expo-auth-session";
@@ -109,6 +111,26 @@ export default function Home({ navigation }) {
               />
             </View>
             <TouchableOpacity
+              style={styles.question}
+              onPress={() => {
+                Alert.alert("Help",
+                "Use this text box to ask for any playlist you want! " +
+                "Treat it as if you were talking to a real person. " +
+                "For example, try some prompts such as: \n\n" + 
+                '- "Make a list of 13 songs for new snowfall"\n' +
+                '- "Create a mashup of hit songs from the 70s, 80s, and 90s"\n' +
+                '- "Give me some songs for a biology major trying to study"\n\n' +
+                "Then go ahead and hit 'GO' to make your awesome playlist!"
+                );
+              }}
+            >
+              <Ionicons
+                  name="information-circle-outline"
+                  size={20}
+                  color={globals.colors.text.secondary}
+                />
+            </TouchableOpacity>
+            <TouchableOpacity
               style={styles.gobutton}
               onPress={() => {
                 navigation.navigate("Results", { prompt });
@@ -201,7 +223,7 @@ const styles = StyleSheet.create({
     backgroundColor: globals.colors.base.secondary,
     borderColor: "grey",
     borderStyle: "solid",
-    width: 300,
+    width: 260,
     height: 50,
     borderBottomLeftRadius: 10,
     borderTopLeftRadius: 10,
@@ -219,6 +241,13 @@ const styles = StyleSheet.create({
     width: 40,
     borderBottomRightRadius: 10,
     borderTopRightRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  question: {
+    backgroundColor: globals.colors.base.secondary,
+    height: 50,
+    width: 40,
     justifyContent: "center",
     alignItems: "center",
   },
