@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { StatusBar } from "expo-status-bar";
 import { setBackgroundColorAsync } from "expo-system-ui";
 
+import { SpotifyProvider } from "./components/SpotifyContext";
 import globals from "./Globals";
 import HomeScreen from "./components/Home";
 import LogInScreen from "./components/LogIn";
@@ -17,37 +18,47 @@ const Tab = createBottomTabNavigator();
 
 function HomeTabs() {
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
+    <SpotifyProvider>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
 
-          if (route.name === "Home") {
-            iconName = focused ? "ios-home" : "ios-home-outline";
-          } else if (route.name === "Settings") {
-            iconName = focused ? "settings" : "settings-outline";
-          }
+            if (route.name === "Home") {
+              iconName = focused ? "ios-home" : "ios-home-outline";
+            } else if (route.name === "Results") {
+              iconName = focused ? "rocket" : "rocket-outline";
+            } else if (route.name === "Settings") {
+              iconName = focused ? "settings" : "settings-outline";
+            }
 
-          // You can return any component that you like here!
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: globals.colors.text.primary,
-        tabBarInactiveTintColor: "gray",
-        tabBarStyle: { backgroundColor: globals.colors.base.secondary },
-      })}
-    >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{ headerShown: false }}
-      />
-      <Tab.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{ headerShown: false }}
-      />
-      {/* <Tab.Screen name="Results" component={ResultsScreen} /> */}
-    </Tab.Navigator>
+            // You can return any component that you like here!
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: globals.colors.text.primary,
+          tabBarInactiveTintColor: "gray",
+          tabBarStyle: { backgroundColor: globals.colors.base.secondary },
+        })}
+      >
+        <Tab.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ headerShown: false }}
+        />
+        <Tab.Screen
+          name="Results"
+          component={ResultsScreen}
+          options={{ headerShown: false }}
+        />
+        <Tab.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{ headerShown: false }}
+        />
+
+        {/* <Tab.Screen name="Results" component={ResultsScreen} /> */}
+      </Tab.Navigator>
+    </SpotifyProvider>
   );
 }
 export default function App() {
@@ -60,35 +71,37 @@ export default function App() {
   });
 
   return (
-    <NavigationContainer>
-      <StatusBar style="light" />
-      <Stack.Navigator initialRouteName="SignUp">
-        <Stack.Screen
-          name="SignUp"
-          component={SignUpScreen}
-          options={{ headerShown: false, cardStyleInterpolator: forFade }}
-        />
-        <Stack.Screen
-          name="LogIn"
-          component={LogInScreen}
-          options={{ headerShown: false, cardStyleInterpolator: forFade }}
-        />
-        <Stack.Screen
-          name="HomeTabs"
-          component={HomeTabs}
-          options={{ headerShown: false, cardStyleInterpolator: forFade }}
-        />
-        <Stack.Screen
-          name="SettingsTabs"
-          component={HomeTabs}
-          options={{ headerShown: false, cardStyleInterpolator: forFade }}
-        />
-        <Stack.Screen
-          name="Results"
-          component={ResultsScreen}
-          options={{ headerShown: false, cardStyleInterpolator: forFade }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <SpotifyProvider>
+      <NavigationContainer>
+        <StatusBar style="light" />
+        <Stack.Navigator initialRouteName="SignUp">
+          <Stack.Screen
+            name="SignUp"
+            component={SignUpScreen}
+            options={{ headerShown: false, cardStyleInterpolator: forFade }}
+          />
+          <Stack.Screen
+            name="LogIn"
+            component={LogInScreen}
+            options={{ headerShown: false, cardStyleInterpolator: forFade }}
+          />
+          <Stack.Screen
+            name="HomeTabs"
+            component={HomeTabs}
+            options={{ headerShown: false, cardStyleInterpolator: forFade }}
+          />
+          <Stack.Screen
+            name="SettingsTabs"
+            component={HomeTabs}
+            options={{ headerShown: false, cardStyleInterpolator: forFade }}
+          />
+          <Stack.Screen
+            name="Results"
+            component={ResultsScreen}
+            options={{ headerShown: false, cardStyleInterpolator: forFade }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SpotifyProvider>
   );
 }
