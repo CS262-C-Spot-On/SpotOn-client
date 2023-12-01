@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+import LottieView from "lottie-react-native";
 import React, { useState, useRef } from "react";
 import {
   Text,
@@ -9,7 +11,6 @@ import {
 } from "react-native";
 
 import globals from "../Globals";
-import LottieView from "lottie-react-native";
 
 export default function LogIn({ navigation }) {
   const animationRef = useRef(null);
@@ -108,7 +109,7 @@ export default function LogIn({ navigation }) {
               style={styles.loginbutton}
               onPress={() => {
                 //handleLogin();
-                navigation.navigate("HomeTabs" , { screen: "Home" });
+                navigation.navigate("HomeTabs", { screen: "Home" });
               }}
             >
               <Text style={styles.logintext}>Log In</Text>

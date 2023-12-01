@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { ResponseType, useAuthRequest } from "expo-auth-session";
@@ -16,7 +17,7 @@ import {
   Modal,
 } from "react-native";
 import SafeAreaView from "react-native-safe-area-view";
-import { Ionicons } from "@expo/vector-icons";
+
 import globals from "../Globals";
 
 WebBrowser.maybeCompleteAuthSession();
