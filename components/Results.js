@@ -417,7 +417,7 @@ export default function Results({ route, navigation }) {
             >
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Text style={{ fontWeight: "bold", marginRight: 3 }}>
-                  Send to Spotify
+                  Copy to Spotify
                 </Text>
                 {sending ? <ActivityIndicator /> : null}
               </View>
@@ -425,7 +425,8 @@ export default function Results({ route, navigation }) {
           </View>
         ) : null}
         {tracks.length > 0 ? (
-          tracks.map((track) => (
+          <View style={{marginBottom: 50}}>
+          { tracks.map((track) => (
             <View key={track.id} style={styles.trackContainer}>
               {track.album.images.length ? (
                 <View>
@@ -445,6 +446,15 @@ export default function Results({ route, navigation }) {
                 <Text style={styles.text2}>
                   {track.album.release_date.split("-")[0]}
                 </Text>
+              </View>
+              <View style={{marginRight: 7}}>
+                <TouchableOpacity onPress={() => {Linking.openURL(track.external_urls.spotify);}}>
+                  <Ionicons
+                    name="musical-notes-outline"
+                    size={25}
+                    color={globals.colors.text.secondary}
+                  />
+              </TouchableOpacity>
               </View>
               <TouchableOpacity
                 // style={styles.spotifybutton}
@@ -466,7 +476,8 @@ export default function Results({ route, navigation }) {
                 />
               </TouchableOpacity>
             </View>
-          ))
+          )) }
+          </View>
         ) : (
           <View style={styles.border}>
             <View
@@ -561,7 +572,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   container2: {
-    width: "75%",
+    width: "65%",
   },
   image: {
     height: 50,
