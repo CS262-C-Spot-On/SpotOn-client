@@ -5,7 +5,7 @@ import axios from "axios";
 import { ResponseType, useAuthRequest } from "expo-auth-session";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -19,28 +19,30 @@ import {
 import SafeAreaView from "react-native-safe-area-view";
 
 import globals from "../Globals";
+import { useSpotify } from "./SpotifyContext";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function Home({ navigation }) {
   const [prompt, setPrompt] = useState("");
-  const [token, setToken] = useState("");
-  const [photo, setPhoto] = useState("");
-  const [url, setURL] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const { spotifyData, setSpotifyData } = useSpotify();
 
-  AsyncStorage.getItem("token").then((t) => {
-    setToken(t);
-    setModalVisible(!t);
-  });
+  // Replace AsyncStorage token fetching with context
+  useEffect(() => {
+    AsyncStorage.getItem("token").then((t) => {
+      setSpotifyData((prev) => ({ ...prev, token: t }));
+      setModalVisible(!t);
+    });
 
-  AsyncStorage.getItem("SpotifyPhoto").then((p) => {
-    setPhoto(p);
-  });
+    AsyncStorage.getItem("SpotifyPhoto").then((p) => {
+      setSpotifyData((prev) => ({ ...prev, photo: p }));
+    });
 
-  AsyncStorage.getItem("SpotifyUrl").then((u) => {
-    setURL(u);
-  });
+    AsyncStorage.getItem("SpotifyUrl").then((u) => {
+      setSpotifyData((prev) => ({ ...prev, url: u }));
+    });
+  }, []);
 
   const discovery = {
     authorizationEndpoint: "https://accounts.spotify.com/authorize",
@@ -59,35 +61,38 @@ export default function Home({ navigation }) {
       usePKCE: false,
       redirectUri: Linking.createURL(),
     },
-    discovery,
+    discovery
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (response?.type === "success") {
-      setToken(response.params.access_token);
-      AsyncStorage.setItem("token", response.params.access_token);
+      const { access_token } = response.params;
+      setSpotifyData((prev) => ({ ...prev, token: access_token }));
+      AsyncStorage.setItem("token", access_token);
+
       axios
         .get("https://api.spotify.com/v1/me", {
           headers: {
-            Authorization: `Bearer ${response.params.access_token}`,
+            Authorization: `Bearer ${access_token}`,
           },
-          params: {},
         })
         .then((data) => {
-          AsyncStorage.setItem("SpotifyName", data.data.display_name);
-          AsyncStorage.setItem("SpotifyUrl", data.data.external_urls.spotify);
-          AsyncStorage.setItem("SpotifyID", data.data.id);
-          AsyncStorage.setItem("SpotifyPhoto", data.data.images[0].url);
-          setPhoto(data.data.images[0].url);
-          setURL(data.data.external_urls.spotify);
+          const { display_name, external_urls, id, images } = data.data;
+          AsyncStorage.setItem("SpotifyName", display_name);
+          AsyncStorage.setItem("SpotifyUrl", external_urls.spotify);
+          AsyncStorage.setItem("SpotifyID", id);
+          AsyncStorage.setItem("SpotifyPhoto", images[0].url);
+          setSpotifyData((prev) => ({
+            ...prev,
+            photo: images[0].url,
+            url: external_urls.spotify,
+          }));
         });
     }
   }, [response]);
 
   const logout = () => {
-    setToken("");
-    setPhoto("");
-    setURL("");
+    setSpotifyData({ token: "", photo: "", url: "" });
     AsyncStorage.removeItem("token");
     AsyncStorage.removeItem("SpotifyName");
     AsyncStorage.removeItem("SpotifyUrl");
@@ -113,22 +118,23 @@ export default function Home({ navigation }) {
             <TouchableOpacity
               style={styles.question}
               onPress={() => {
-                Alert.alert("Help",
-                "Use this text box to ask for any playlist you want! " +
-                "Treat it as if you were talking to a real person. " +
-                "For example, try some prompts such as: \n\n" + 
-                '- "Make a list of 13 songs for new snowfall"\n' +
-                '- "Create a mashup of hit songs from the 70s, 80s, and 90s"\n' +
-                '- "Give me some songs for a biology major trying to study"\n\n' +
-                "Then go ahead and hit 'GO' to make your awesome playlist!"
+                Alert.alert(
+                  "Help",
+                  "Use this text box to ask for any playlist you want! " +
+                    "Treat it as if you were talking to a real person. " +
+                    "For example, try some prompts such as: \n\n" +
+                    '- "Make a list of 13 songs for new snowfall"\n' +
+                    '- "Create a mashup of hit songs from the 70s, 80s, and 90s"\n' +
+                    '- "Give me some songs for a biology major trying to study"\n\n' +
+                    "Then go ahead and hit 'GO' to make your awesome playlist!"
                 );
               }}
             >
               <Ionicons
-                  name="information-circle-outline"
-                  size={20}
-                  color={globals.colors.text.secondary}
-                />
+                name="information-circle-outline"
+                size={20}
+                color={globals.colors.text.secondary}
+              />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.gobutton}
@@ -139,7 +145,7 @@ export default function Home({ navigation }) {
               <Text style={{ fontWeight: "bold" }}>Go</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.smallparent}>
+          {/* <View style={styles.smallparent}>
             <View>
               {!token ? (
                 <TouchableOpacity
@@ -167,7 +173,7 @@ export default function Home({ navigation }) {
                 <Image style={styles.image} source={{ uri: photo }} />
               </TouchableOpacity>
             )}
-          </View>
+          </View> */}
         </View>
       </View>
       {/* Modal for Spotify Connection */}
