@@ -193,6 +193,7 @@ export default function Home({ navigation }) {
               style={styles.spotifybutton}
               onPress={() => {
                 promptAsync();
+                setModalVisible(!modalVisible);
               }}
             >
               <Text style={{ fontWeight: "bold" }}>Connect to Spotify</Text>

@@ -12,6 +12,7 @@ import LogInScreen from "./components/LogIn";
 import ResultsScreen from "./components/Results";
 import SettingsScreen from "./components/Settings";
 import SignUpScreen from "./components/SignUp";
+import HistoryScreen from "./components/History";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -45,15 +46,32 @@ function HomeTabs() {
           component={HomeScreen}
           options={{ headerShown: false }}
         />
-        <Tab.Screen
+        {/* <Tab.Screen
           name="Results"
           component={ResultsScreen}
           options={{ headerShown: false }}
-        />
+        /> */}
         <Tab.Screen
           name="Settings"
           component={SettingsScreen}
-          options={{ headerShown: false }}
+          options={({ navigation }) => ({
+            headerShown: true,
+            headerStyle: {
+              backgroundColor: globals.colors.base.secondary,
+            },
+            headerTintColor: globals.colors.text.primary,
+            headerTitleStyle: {
+              fontWeight: "bold",
+            },
+            headerLeft: () => (
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color={globals.colors.text.primary}
+                onPress={() => navigation.goBack()}
+              />
+            ),
+          })}
         />
 
         {/* <Tab.Screen name="Results" component={ResultsScreen} /> */}
@@ -98,7 +116,46 @@ export default function App() {
           <Stack.Screen
             name="Results"
             component={ResultsScreen}
-            options={{ headerShown: false, cardStyleInterpolator: forFade }}
+            options={({ navigation }) => ({
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: globals.colors.base.secondary,
+              },
+              headerTintColor: globals.colors.text.primary,
+              headerTitleStyle: {
+                fontWeight: "bold",
+              },
+              headerLeft: () => (
+                <Ionicons
+                  name="arrow-back"
+                  size={24}
+                  color={globals.colors.text.primary}
+                  onPress={() => navigation.goBack()}
+                />
+              ),
+            })}
+          />
+          <Stack.Screen
+            name="History"
+            component={HistoryScreen}
+            options={({ navigation }) => ({
+              headerShown: true,
+              headerStyle: {
+                backgroundColor: globals.colors.base.secondary,
+              },
+              headerTintColor: globals.colors.text.primary,
+              headerTitleStyle: {
+                fontWeight: "bold",
+              },
+              headerLeft: () => (
+                <Ionicons
+                  name="arrow-back"
+                  size={24}
+                  color={globals.colors.text.primary}
+                  onPress={() => navigation.goBack()}
+                />
+              ),
+            })}
           />
         </Stack.Navigator>
       </NavigationContainer>

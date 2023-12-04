@@ -140,7 +140,7 @@ export default function Results({ route, navigation }) {
                       text: "Go Home",
                       onPress: () => navigation.navigate("Home"),
                     },
-                  ],
+                  ]
                 );
               })
               .then((data) => {
@@ -157,7 +157,7 @@ export default function Results({ route, navigation }) {
                         slice.artists[0].name
                           .toLowerCase()
                           .replaceAll(/the/g, "")
-                          .split(" ")[0],
+                          .split(" ")[0]
                       )
                   ) {
                     setTracks((old) => {
@@ -211,7 +211,7 @@ export default function Results({ route, navigation }) {
           count++;
         }
         setLoaded([top, max]);
-      },
+      }
     );
 
     // Data sent to LLM server
@@ -252,7 +252,7 @@ export default function Results({ route, navigation }) {
           tracks
             .map(
               (track) =>
-                `{"song": "${track.name}", "artist": "${track.artists[0].name}"}`,
+                `{"song": "${track.name}", "artist": "${track.artists[0].name}"}`
             )
             .join(", ")
         }] Please response in a JSON format, i.e. {"song": "[SONG]", "artist": "[ARTIST]"}.` +
@@ -302,7 +302,7 @@ export default function Results({ route, navigation }) {
                     text: "Go Home",
                     onPress: () => navigation.navigate("Home"),
                   },
-                ],
+                ]
               );
             })
             .then((data) => {
@@ -319,7 +319,7 @@ export default function Results({ route, navigation }) {
                       slice.artists[0].name
                         .toLowerCase()
                         .replaceAll(/the/g, "")
-                        .split(" ")[0],
+                        .split(" ")[0]
                     )
                 ) {
                   setTracks((old) => {
@@ -377,7 +377,7 @@ export default function Results({ route, navigation }) {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
-            },
+            }
           )
           .then((data) => {
             axios
@@ -391,7 +391,7 @@ export default function Results({ route, navigation }) {
                   headers: {
                     Authorization: `Bearer ${token}`,
                   },
-                },
+                }
               )
               .then((trackdata) => {
                 setTimeout(() => {
@@ -425,58 +425,62 @@ export default function Results({ route, navigation }) {
           </View>
         ) : null}
         {tracks.length > 0 ? (
-          <View style={{marginBottom: 50}}>
-          { tracks.map((track) => (
-            <View key={track.id} style={styles.trackContainer}>
-              {track.album.images.length ? (
-                <View>
-                  <Image
-                    style={styles.image}
-                    source={{ uri: track.album.images[0].url }}
-                  />
+          <View style={{ marginBottom: 50 }}>
+            {tracks.map((track) => (
+              <View key={track.id} style={styles.trackContainer}>
+                {track.album.images.length ? (
+                  <View>
+                    <Image
+                      style={styles.image}
+                      source={{ uri: track.album.images[0].url }}
+                    />
+                  </View>
+                ) : (
+                  <View>
+                    <Text>No Image</Text>
+                  </View>
+                )}
+                <View style={styles.container2}>
+                  <Text style={styles.text}>{track.name}</Text>
+                  <Text style={styles.text2}>{track.artists[0].name}</Text>
+                  <Text style={styles.text2}>
+                    {track.album.release_date.split("-")[0]}
+                  </Text>
                 </View>
-              ) : (
-                <View>
-                  <Text>No Image</Text>
+                <View style={{ marginRight: 7 }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      Linking.openURL(track.external_urls.spotify);
+                    }}
+                  >
+                    <Ionicons
+                      name="musical-notes-outline"
+                      size={25}
+                      color={globals.colors.text.secondary}
+                    />
+                  </TouchableOpacity>
                 </View>
-              )}
-              <View style={styles.container2}>
-                <Text style={styles.text}>{track.name}</Text>
-                <Text style={styles.text2}>{track.artists[0].name}</Text>
-                <Text style={styles.text2}>
-                  {track.album.release_date.split("-")[0]}
-                </Text>
-              </View>
-              <View style={{marginRight: 7}}>
-                <TouchableOpacity onPress={() => {Linking.openURL(track.external_urls.spotify);}}>
+                <TouchableOpacity
+                  // style={styles.spotifybutton}
+                  onPress={() => {
+                    setTracks((old) => {
+                      const ind = old.map((i) => i.id).indexOf(track.id);
+                      if (~ind) {
+                        old.splice(ind, 1);
+                        return old.splice(0); // Updates view
+                      }
+                      return old; // No update view
+                    });
+                  }}
+                >
                   <Ionicons
-                    name="musical-notes-outline"
+                    name="trash-outline"
                     size={25}
                     color={globals.colors.text.secondary}
                   />
-              </TouchableOpacity>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                // style={styles.spotifybutton}
-                onPress={() => {
-                  setTracks((old) => {
-                    const ind = old.map((i) => i.id).indexOf(track.id);
-                    if (~ind) {
-                      old.splice(ind, 1);
-                      return old.splice(0); // Updates view
-                    }
-                    return old; // No update view
-                  });
-                }}
-              >
-                <Ionicons
-                  name="trash-outline"
-                  size={25}
-                  color={globals.colors.text.secondary}
-                />
-              </TouchableOpacity>
-            </View>
-          )) }
+            ))}
           </View>
         ) : (
           <View style={styles.border}>
@@ -567,7 +571,6 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   text2: {
-    color: globals.colors.text.secondary,
     flex: 1,
     flexWrap: "wrap",
   },
