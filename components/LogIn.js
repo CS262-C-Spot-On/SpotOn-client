@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import LottieView from "lottie-react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, useRef } from "react";
 import {
   Text,
@@ -34,6 +35,15 @@ export default function LogIn({ navigation }) {
           // Authentication successful
           setIsLoading(false);
           navigation.navigate("HomeTabs", { screen: "Home" });
+
+          // Store user's email in AsyncStorage
+          await AsyncStorage.setItem("userEmail", email);
+
+          // Fetch prompts based on user's email and store in AsyncStorage
+          const promptsResponse = await fetch(`https://spot-on.azurewebsites.net/prompts/${email}`);
+          const promptsData = await promptsResponse.json();
+
+          await AsyncStorage.setItem("prompts", JSON.stringify(promptsData));
         } else {
           // Password doesn't match
           alert("Error: Incorrect password");
@@ -108,8 +118,8 @@ export default function LogIn({ navigation }) {
             <TouchableOpacity
               style={styles.loginbutton}
               onPress={() => {
-                //handleLogin();
-                navigation.navigate("HomeTabs", { screen: "Home" });
+                handleLogin();
+                //navigation.navigate("HomeTabs", { screen: "Home" });
               }}
             >
               <Text style={styles.logintext}>Log In</Text>
