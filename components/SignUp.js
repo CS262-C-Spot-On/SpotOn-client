@@ -66,22 +66,22 @@ export default function SignUp({ navigation }) {
       setIsLoading(false);
     }
   };
-  if (isLoading) {
-    // Show only loader when loading
-    return (
-      <SafeAreaView style={styles.phone}>
-        <View style={styles.c_parent}>
-          {/* <ActivityIndicator></ActivityIndicator> */}
-          <LottieView
-            ref={animationRef}
-            source={require("../assets/lottie.json")}
-            autoPlay
-            loop
-          />
-        </View>
-      </SafeAreaView>
-    );
-  }
+  // if (isLoading) {
+  //   // Show only loader when loading
+  //   return (
+  //     <SafeAreaView style={styles.phone}>
+  //       <View style={styles.c_parent}>
+  //         {/* <ActivityIndicator></ActivityIndicator> */}
+  //         <LottieView
+  //           ref={animationRef}
+  //           source={require("../assets/lottie.json")}
+  //           autoPlay
+  //           loop
+  //         />
+  //       </View>
+  //     </SafeAreaView>
+  //   );
+  // }
   return (
     <SafeAreaView style={styles.phone}>
       <View style={styles.container}>

@@ -22,7 +22,53 @@ import globals from "../Globals";
 import { useSpotify } from "./SpotifyContext";
 
 WebBrowser.maybeCompleteAuthSession();
+const savePromptLocally = async (prompt) => {
+  try {
+    // Retrieve user's email from AsyncStorage
+    const userEmail = await AsyncStorage.getItem("userEmail");
 
+    // Check if the prompt is blank
+    if (!prompt.trim()) {
+      console.warn("Blank prompts are not added.");
+      return;
+    }
+
+    // Get current system date
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split('T')[0];
+
+    // Get existing prompts from AsyncStorage
+    const existingPromptsString = await AsyncStorage.getItem("prompts");
+    const existingPrompts = existingPromptsString ? JSON.parse(existingPromptsString) : [];
+
+    // Add the new prompt to the array
+    existingPrompts.push({ userEmail, prompt, promptDate: formattedDate });
+
+    // Save the updated prompts back to AsyncStorage
+    await AsyncStorage.setItem("prompts", JSON.stringify(existingPrompts));
+
+    // Make a POST request using fetch
+    const response = await fetch("https://spot-on.azurewebsites.net/prompts/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: userEmail,
+        prompt,
+        prompt_date: formattedDate,
+      }),
+    });
+
+    // Check if the POST request was successful
+    if (!response.ok) {
+      console.error("Failed to make POST request:", response.status, response.statusText);
+    }
+
+  } catch (error) {
+    console.error("Error saving prompt locally:", error);
+  }
+};
 export default function Home({ navigation }) {
   const [prompt, setPrompt] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -121,12 +167,12 @@ export default function Home({ navigation }) {
                 Alert.alert(
                   "Help",
                   "Use this text box to ask for any playlist you want! " +
-                    "Treat it as if you were talking to a real person. " +
-                    "For example, try some prompts such as: \n\n" +
-                    '- "Make a list of 13 songs for new snowfall"\n' +
-                    '- "Create a mashup of hit songs from the 70s, 80s, and 90s"\n' +
-                    '- "Give me some songs for a biology major trying to study"\n\n' +
-                    "Then go ahead and hit 'GO' to make your awesome playlist!"
+                  "Treat it as if you were talking to a real person. " +
+                  "For example, try some prompts such as: \n\n" +
+                  '- "Make a list of 13 songs for new snowfall"\n' +
+                  '- "Create a mashup of hit songs from the 70s, 80s, and 90s"\n' +
+                  '- "Give me some songs for a biology major trying to study"\n\n' +
+                  "Then go ahead and hit 'GO' to make your awesome playlist!"
                 );
               }}
             >
@@ -139,6 +185,8 @@ export default function Home({ navigation }) {
             <TouchableOpacity
               style={styles.gobutton}
               onPress={() => {
+                savePromptLocally(prompt);
+
                 navigation.navigate("Results", { prompt });
               }}
             >
