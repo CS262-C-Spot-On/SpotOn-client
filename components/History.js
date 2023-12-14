@@ -1,31 +1,13 @@
-// import { Text, View, SafeAreaView, StyleSheet } from "react-native";
-// import React, { Component } from "react";
-// import globals from "../Globals";
-
-// export default function History() {
-//   return (
-//     <SafeAreaView style={styles.phone}>
-//       <Text>History</Text>
-//     </SafeAreaView>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   phone: {
-//     height: "100%",
-//     width: "100%",
-//     flex: 1,
-//     backgroundColor: globals.colors.base.primary,
-//   },
-// });
+/* eslint-disable import/order */
+/* eslint-disable prettier/prettier */
 
 // export default History
-import { Text, View, SafeAreaView, FlatList, StyleSheet } from "react-native";
+import { Text, View, SafeAreaView, FlatList, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import globals from "../Globals";
 
-export default function History() {
+export default function History({ navigation }) {
   const [prompts, setPrompts] = useState([]);
 
   const loadPromptsLocally = async () => {
@@ -49,15 +31,19 @@ export default function History() {
   return (
     <SafeAreaView style={styles.phone}>
       <View style={styles.container}>
-        <Text style={styles.title}>History</Text>
         <FlatList
+          style={{width: "100%"}}
           data={prompts}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
             <View style={styles.promptContainer}>
               <View style={styles.row}>
-                <Text style={styles.promptText}>{item.prompt}</Text>
-                <Text style={styles.dateText}>{item.prompt_date}</Text>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate("Results", item.prompt);
+                  }}>
+                  <Text style={styles.promptText}>{`"${item.prompt}"`}</Text>
+                  <Text style={styles.dateText}>{item.prompt_date == null ? "Just Now" : item.prompt_date.split('T')[0]}</Text>
+                </TouchableOpacity>
               </View>
             </View>
           )}
@@ -78,7 +64,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#fff",
     padding: 16,
   },
   title: {
@@ -97,10 +82,10 @@ const styles = StyleSheet.create({
   },
   promptText: {
     fontSize: 16,
-    marginBottom: 8,
+    color: globals.colors.text.primary
   },
   dateText: {
     fontSize: 14,
-    color: "#888",
+    color: globals.colors.text.secondary
   },
 });

@@ -427,6 +427,11 @@ export default function Results({ route, navigation }) {
         {tracks.length > 0 ? (
           <View style={{ marginBottom: 50 }}>
             {tracks.map((track) => (
+              <TouchableOpacity
+                onPress={() => {
+                  Linking.openURL(track.external_urls.spotify);
+                }}
+              >
               <View key={track.id} style={styles.trackContainer}>
                 {track.album.images.length ? (
                   <View>
@@ -446,19 +451,6 @@ export default function Results({ route, navigation }) {
                   <Text style={styles.text2}>
                     {track.album.release_date.split("-")[0]}
                   </Text>
-                </View>
-                <View style={{ marginRight: 7 }}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      Linking.openURL(track.external_urls.spotify);
-                    }}
-                  >
-                    <Ionicons
-                      name="musical-notes-outline"
-                      size={25}
-                      color={globals.colors.text.secondary}
-                    />
-                  </TouchableOpacity>
                 </View>
                 <TouchableOpacity
                   // style={styles.spotifybutton}
@@ -480,6 +472,7 @@ export default function Results({ route, navigation }) {
                   />
                 </TouchableOpacity>
               </View>
+              </TouchableOpacity>
             ))}
           </View>
         ) : (
@@ -573,9 +566,10 @@ const styles = StyleSheet.create({
   text2: {
     flex: 1,
     flexWrap: "wrap",
+    color: globals.colors.text.secondary,
   },
   container2: {
-    width: "65%",
+    width: "70%",
   },
   image: {
     height: 50,

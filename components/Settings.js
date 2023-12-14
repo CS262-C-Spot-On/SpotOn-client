@@ -1,4 +1,6 @@
-// Settings.js
+/* eslint-disable import/order */
+/* eslint-disable prettier/prettier */
+
 import { useSpotify } from "./SpotifyContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import globals from "../Globals";
