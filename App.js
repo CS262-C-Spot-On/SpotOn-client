@@ -199,7 +199,8 @@ export default function App() {
                   onPress={() => {
                     Alert.alert(
                       "Help",
-                      "This is the history page! This holds all of the previous prompts you have generated, as well as the date it "
+                      "This is the history page! This holds all of the previous prompts entered, as well as the date you entered it on. " +
+                      "To reproduce the results of a previous prompt, simply click on the prompt in quotations."
                     );
                   }}
                 />
